@@ -1,11 +1,39 @@
 <?php
-require_once __DIR__ . '/../../includes/auth.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once __DIR__ . '/../../panel/includes/auth.php';
+require_once __DIR__ . '/../../panel/includes/database.php';
+require_once __DIR__ . '/../includes/ai-client.php';
 
 $auth = new Auth();
 $auth->requireAdmin();
 
 $db = Database::getInstance()->getConnection();
+$apiTestSuccess = '';
+$apiTestError = '';
+
+// Handle API health check
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'test_api') {
+    try {
+        $client = new AIClient();
+        $response = $client->sendMessage([
+            [
+                'role' => 'user',
+                'content' => 'Return the single word OK for health check.'
+            ]
+        ], 'You are performing a health check for the admin panel; respond with OK only.');
+
+        if (!$response['success']) {
+            throw new Exception($response['error'] ?? 'Unknown API error');
+        }
+
+        $apiTestSuccess = sprintf(
+            'API test PASSED — reply: %s | tokens used: %s',
+            trim($response['content']),
+            $response['tokens_used'] ?? 'n/a'
+        );
+    } catch (Exception $e) {
+        $apiTestError = 'API test failed: ' . $e->getMessage();
+    }
+}
 
 // Get statistics
 $statsQuery = "
@@ -60,15 +88,14 @@ $customersWithPlans = $db->query("
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Editor Admin - ShieldStack</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/ai-editor.css">
+    <link rel="stylesheet" href="/panel/assets/css/style.css">
 </head>
 <body>
     <div class="dashboard-container">
-        <?php include '../../admin/includes/sidebar.php'; ?>
+        <?php include '../../panel/admin/includes/sidebar.php'; ?>
 
         <div class="main-content">
-            <?php include '../../admin/includes/topbar.php'; ?>
+            <?php include '../../panel/admin/includes/topbar.php'; ?>
 
             <div class="content-wrapper">
                 <div class="page-header">
@@ -149,8 +176,27 @@ $customersWithPlans = $db->query("
                             <a href="assign-plan.php" class="btn btn-primary">➕ Assign AI Plan</a>
                             <a href="manage-ssh.php" class="btn btn-secondary">🔐 Manage SSH Credentials</a>
                             <a href="view-logs.php" class="btn btn-secondary">📊 View All Logs</a>
-                            <a href="settings.php" class="btn btn-secondary">⚙️ AI Settings</a>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Health Checks -->
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h3>Health Checks</h3>
+                    </div>
+                    <div class="card-body">
+                        <?php if ($apiTestSuccess): ?>
+                            <div class="alert alert-success"><?php echo htmlspecialchars($apiTestSuccess); ?></div>
+                        <?php endif; ?>
+                        <?php if ($apiTestError): ?>
+                            <div class="alert alert-danger"><?php echo htmlspecialchars($apiTestError); ?></div>
+                        <?php endif; ?>
+                        <form method="POST">
+                            <input type="hidden" name="action" value="test_api">
+                            <button type="submit" class="btn btn-info">Run API Health Check</button>
+                            <small class="form-text text-muted">Sends a lightweight ping to Clove via AIClient using current DB settings.</small>
+                        </form>
                     </div>
                 </div>
 
@@ -173,7 +219,6 @@ $customersWithPlans = $db->query("
                                             <th>Tokens Used</th>
                                             <th>Status</th>
                                             <th>Activated</th>
-                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -195,9 +240,6 @@ $customersWithPlans = $db->query("
                                                 </td>
                                                 <td><span class="badge badge-<?php echo $customer['status']; ?>"><?php echo ucfirst($customer['status']); ?></span></td>
                                                 <td><?php echo date('M d, Y', strtotime($customer['activated_at'])); ?></td>
-                                                <td>
-                                                    <a href="edit-plan.php?id=<?php echo $customer['id']; ?>" class="btn btn-sm btn-secondary">Edit</a>
-                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -261,5 +303,6 @@ $customersWithPlans = $db->query("
             </div>
         </div>
     </div>
+    <script src="/panel/assets/js/mobile-menu.js"></script>
 </body>
 </html>

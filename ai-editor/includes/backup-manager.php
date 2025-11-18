@@ -9,7 +9,7 @@ class BackupManager {
     private $retentionDays = 30;
 
     public function __construct() {
-        require_once __DIR__ . '/../../includes/database.php';
+        require_once __DIR__ . '/../../panel/includes/database.php';
         $this->db = Database::getInstance()->getConnection();
         $this->loadSettings();
     }

@@ -11,7 +11,8 @@
             console.log('Creating mobile overlay...');
             const overlay = document.createElement('div');
             overlay.className = 'mobile-overlay';
-            overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:999;pointer-events:none;';
+            // Let CSS control positioning/opacity; keep pointer-events off until activated
+            overlay.style.cssText = 'display:none;pointer-events:none;';
             document.body.appendChild(overlay);
             console.log('Overlay created with z-index 999');
         }

@@ -5,6 +5,8 @@
  * Supports function calling for SSH operations
  */
 
+require_once __DIR__ . '/ai-anthropic-adapter.php';
+
 class AIClient {
     private $api_endpoint;
     private $api_key;
@@ -12,7 +14,20 @@ class AIClient {
     private $db;
 
     public function __construct() {
-        require_once __DIR__ . '/../../includes/database.php';
+        // Reuse existing DB class if already loaded (chat.php includes the shared Database)
+        if (!class_exists('Database')) {
+            $sharedDb = __DIR__ . '/../../includes/database.php';
+            $panelDb = __DIR__ . '/../../panel/includes/database.php';
+
+            if (file_exists($sharedDb)) {
+                require_once $sharedDb;
+            } elseif (file_exists($panelDb)) {
+                require_once $panelDb;
+            } else {
+                throw new Exception('Database configuration not found');
+            }
+        }
+
         $this->db = Database::getInstance()->getConnection();
 
         // Load configuration from system settings
@@ -59,25 +74,26 @@ class AIClient {
      */
     public function sendMessage($messages, $systemPrompt = '', $tools = []) {
         try {
-            // Build request payload
+            // Convert messages to Anthropic format
+            $converted = AnthropicAdapter::convertMessages($messages, $systemPrompt);
+
+            // Build request payload for Anthropic API
             $payload = [
                 'model' => $this->model,
-                'messages' => $this->buildMessages($messages, $systemPrompt),
-                'temperature' => 0.7,
+                'messages' => $converted['messages'],
                 'max_tokens' => 2000
             ];
 
-            // Add tools if provided
-            if (!empty($tools)) {
-                $payload['tools'] = $tools;
-                $payload['tool_choice'] = 'auto';
+            // Add system prompt if provided
+            if (!empty($converted['system'])) {
+                $payload['system'] = $converted['system'];
             }
 
             // Make API request
             $response = $this->makeRequest($payload);
 
-            // Parse response
-            return $this->parseResponse($response);
+            // Convert response back to OpenAI format
+            return AnthropicAdapter::convertResponse($response);
 
         } catch (Exception $e) {
             return [
@@ -125,7 +141,7 @@ class AIClient {
             CURLOPT_POSTFIELDS => json_encode($payload),
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'Authorization: Bearer ' . $this->api_key
+                'X-API-Key: ' . $this->api_key
             ],
             CURLOPT_TIMEOUT => 60,
             CURLOPT_SSL_VERIFYPEER => true

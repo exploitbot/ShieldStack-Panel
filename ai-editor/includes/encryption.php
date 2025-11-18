@@ -29,7 +29,7 @@ class CredentialEncryption {
         }
 
         // Check system settings
-        require_once __DIR__ . '/../../includes/database.php';
+        require_once __DIR__ . '/../../panel/includes/database.php';
         $db = Database::getInstance()->getConnection();
 
         $stmt = $db->prepare("SELECT value FROM system_settings WHERE `key` = 'ai_ssh_encryption_key'");

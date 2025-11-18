@@ -1,3 +1,13 @@
+**Filesystem in use for shieldstack.dev (production site)**  
+- Landing: `/var/www/html/index.html` (served via `/var/www/html/index.php` redirect)  
+- Login: `/var/www/html/login.php`  
+- Shared assets: `/var/www/html/assets/` (CSS/JS for landing, panel sidebar overlay)  
+- Shared config/auth: `/var/www/html/includes/` (DB credentials, auth helpers)  
+- Client/admin portal: `/var/www/html/panel/` (includes `/panel/admin/*`, `/panel/includes/*`)  
+- AI Editor: `/var/www/html/ai-editor/` (customer UI, `/ai-editor/admin/*`, `/ai-editor/api/chat.php`, `/ai-editor/includes/*`, `/ai-editor/assets/*`)  
+- Database config: `/var/www/html/panel/includes/config.php` and `/var/www/html/includes/config.php` (point to `shieldstack_panel` DB)  
+- Logs: PHP-FPM (`/var/log/php-fpm/www-error.log`), Nginx (`/var/log/nginx/ai.shieldstack.dev-error.log`, `ai_error.log` if present)
+
 # ShieldStack Panel - Setup & Usage Guide
 
 ## 🚀 Quick Start
@@ -97,13 +107,26 @@ mysql -u root -p shieldstack_panel < setup_eric_ai_access.sql
 
 ## 🤖 AI Website Editor Setup
 
-### 1. API Configuration
-The AI Editor is pre-configured to use a custom OpenAI-compatible API:
-- **Endpoint:** `https://clove.shieldstack.dev/v1/chat/completions`
-- **API Key:** `eric`
-- **Model:** `gpt-4`
+### 1. API Configuration (Clove / Anthropic Native)
 
-Configuration file: `ai-editor/config.php`
+Authoritative runtime values (pulled from DB `system_settings`):
+- Endpoint: `https://clove.shieldstack.dev/v1/messages` (Anthropic native only)
+- API Key: `16efcca21beec3597d3b2c66c49c98788617d8ffa33f314ea5c7aa292915f4ba` (admin key)
+- Model: `claude-sonnet-4-5-20250929`
+- Auth header: `X-API-Key: <key>` (do NOT use `Authorization: Bearer`)
+- Storage: database, not config files  
+  ```sql
+  SELECT `key`, value FROM system_settings WHERE `key` LIKE 'ai_%';
+  -- keys: ai_openai_endpoint, ai_openai_key, ai_model_name
+  ```
+
+Operational notes:
+- Only `/v1/messages` works; `/v1/chat/completions` returns 405 and is not used.
+- The checked-in `ai-editor/config.php` and `config.production.php` still list `api_key => 'eric'` and `/v1/chat/completions`, but those files are NOT read at runtime; the DB values above are what the app uses.
+- The Clove “eric” key is invalid (timeout on `/v1/messages`, 405 on `/v1/chat/completions`). Use the admin key above.
+
+Format adapter:
+- `ai-editor/includes/ai-anthropic-adapter.php` converts internal OpenAI-style messages to Anthropic native payloads and back (separates/merges system prompts, flattens `content[]` blocks, sums token usage).
 
 ### 2. Grant AI Access to Users
 
@@ -317,10 +340,11 @@ DB_PASS=your_password
 APP_ENV=production
 APP_DEBUG=false
 
-# AI Editor
-AI_OPENAI_ENDPOINT=https://clove.shieldstack.dev/v1/chat/completions
-AI_OPENAI_KEY=eric
-AI_OPENAI_MODEL=gpt-4
+# AI Editor (Stored in database, not environment variables)
+# Note: Configuration is in system_settings table
+AI_OPENAI_ENDPOINT=https://clove.shieldstack.dev/v1/messages
+AI_OPENAI_KEY=16efcca21beec3597d3b2c66c49c98788617d8ffa33f314ea5c7aa292915f4ba
+AI_OPENAI_MODEL=claude-sonnet-4-5-20250929
 AI_SSH_ENCRYPTION_KEY=your_32_byte_hex_key
 ```
 

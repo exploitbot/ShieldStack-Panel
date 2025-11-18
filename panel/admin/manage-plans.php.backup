@@ -1,0 +1,480 @@
+<?php
+require_once '../includes/auth.php';
+require_once '../includes/database.php';
+
+$auth = new Auth();
+$auth->requireAdmin();
+
+$db = Database::getInstance()->getConnection();
+
+$success = '';
+$error = '';
+
+// Handle AJAX requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+    header('Content-Type: application/json');
+    
+    try {
+        // Add plan
+        if (isset($_POST['action']) && $_POST['action'] === 'add') {
+            $stmt = $db->prepare("
+                INSERT INTO plans (
+                    name, type, category, description, price, billing_cycle, 
+                    disk_space, bandwidth, `databases`, email_accounts, subdomains, 
+                    ftp_accounts, ssl_certificates, daily_backups, support_level, 
+                    display_order, status, features
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            
+            $stmt->execute([
+                $_POST['name'],
+                $_POST['type'],
+                $_POST['category'],
+                $_POST['description'],
+                $_POST['price'],
+                $_POST['billing_cycle'],
+                $_POST['disk_space'],
+                $_POST['bandwidth'],
+                $_POST['databases'],
+                $_POST['email_accounts'],
+                $_POST['subdomains'],
+                $_POST['ftp_accounts'],
+                isset($_POST['ssl_certificates']) ? 1 : 0,
+                isset($_POST['daily_backups']) ? 1 : 0,
+                $_POST['support_level'],
+                $_POST['display_order'],
+                $_POST['status'],
+                $_POST['features']
+            ]);
+            
+            echo json_encode(['success' => true, 'message' => 'Plan added successfully!']);
+            exit;
+        }
+        
+        // Update plan
+        if (isset($_POST['action']) && $_POST['action'] === 'edit') {
+            $stmt = $db->prepare("
+                UPDATE plans SET
+                    name = ?, type = ?, category = ?, description = ?, price = ?, 
+                    billing_cycle = ?, disk_space = ?, bandwidth = ?, `databases` = ?, 
+                    email_accounts = ?, subdomains = ?, ftp_accounts = ?, 
+                    ssl_certificates = ?, daily_backups = ?, support_level = ?, 
+                    display_order = ?, status = ?, features = ?
+                WHERE id = ?
+            ");
+            
+            $stmt->execute([
+                $_POST['name'],
+                $_POST['type'],
+                $_POST['category'],
+                $_POST['description'],
+                $_POST['price'],
+                $_POST['billing_cycle'],
+                $_POST['disk_space'],
+                $_POST['bandwidth'],
+                $_POST['databases'],
+                $_POST['email_accounts'],
+                $_POST['subdomains'],
+                $_POST['ftp_accounts'],
+                isset($_POST['ssl_certificates']) ? 1 : 0,
+                isset($_POST['daily_backups']) ? 1 : 0,
+                $_POST['support_level'],
+                $_POST['display_order'],
+                $_POST['status'],
+                $_POST['features'],
+                $_POST['id']
+            ]);
+            
+            echo json_encode(['success' => true, 'message' => 'Plan updated successfully!']);
+            exit;
+        }
+        
+        // Delete plan
+        if (isset($_POST['action']) && $_POST['action'] === 'delete') {
+            // Check if plan has services
+            $checkStmt = $db->prepare("SELECT COUNT(*) as count FROM services WHERE plan_id = ?");
+            $checkStmt->execute([$_POST['id']]);
+            $result = $checkStmt->fetch();
+            
+            if ($result['count'] > 0) {
+                echo json_encode(['success' => false, 'message' => 'Cannot delete plan: It has active services.']);
+                exit;
+            }
+            
+            $stmt = $db->prepare("DELETE FROM plans WHERE id = ?");
+            $stmt->execute([$_POST['id']]);
+            
+            echo json_encode(['success' => true, 'message' => 'Plan deleted successfully!']);
+            exit;
+        }
+        
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+        exit;
+    }
+}
+
+// Get all plans
+$plansStmt = $db->query("SELECT * FROM plans ORDER BY display_order, category, price");
+$plans = $plansStmt->fetchAll();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Plans - ShieldStack Admin</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .plan-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .plan-item:hover {
+            border-color: var(--primary-color);
+        }
+        .plan-info h3 {
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        .plan-meta {
+            display: flex;
+            gap: 15px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-grid-full {
+            grid-column: 1 / -1;
+        }
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .plan-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .plan-actions {
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <?php include 'includes/sidebar.php'; ?>
+        <div class="main-content">
+            <?php include 'includes/topbar.php'; ?>
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h1 class="page-title">Manage Plans</h1>
+                    <p class="page-subtitle">Create and manage hosting plans and products</p>
+                </div>
+
+                <div id="alertContainer"></div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">All Plans (<?php echo count($plans); ?>)</h2>
+                        <button onclick="openAddModal()" class="btn btn-primary">Add New Plan</button>
+                    </div>
+                    <div class="card-body">
+                        <?php if (count($plans) > 0): ?>
+                            <div id="plansList">
+                                <?php foreach ($plans as $plan): ?>
+                                    <div class="plan-item" data-id="<?php echo $plan['id']; ?>">
+                                        <div class="plan-info">
+                                            <h3><?php echo htmlspecialchars($plan['name']); ?></h3>
+                                            <div class="plan-meta">
+                                                <span><strong>Category:</strong> <?php echo htmlspecialchars($plan['category']); ?></span>
+                                                <span><strong>Type:</strong> <?php echo htmlspecialchars($plan['type']); ?></span>
+                                                <span><strong>Price:</strong> $<?php echo number_format($plan['price'], 2); ?>/<?php echo htmlspecialchars($plan['billing_cycle']); ?></span>
+                                                <span class="badge badge-<?php echo $plan['status'] === 'active' ? 'success' : 'error'; ?>">
+                                                    <?php echo htmlspecialchars($plan['status']); ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="plan-actions action-buttons">
+                                            <button onclick='editPlan(<?php echo htmlspecialchars(json_encode($plan)); ?>)' class="btn btn-secondary">Edit</button>
+                                            <button onclick="deletePlan(<?php echo $plan['id']; ?>)" class="btn btn-danger">Delete</button>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
+                                No plans yet. Click "Add New Plan" to create one.
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Plan Modal -->
+    <div id="planModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <h2 id="modalTitle" style="margin-bottom: 20px; color: var(--primary-color);">Add New Plan</h2>
+            <form id="planForm">
+                <input type="hidden" id="planId" name="id">
+                <input type="hidden" id="formAction" name="action" value="add">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Plan Name *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="hosting">Hosting</option>
+                            <option value="vps">VPS</option>
+                            <option value="dedicated">Dedicated</option>
+                            <option value="ssl">SSL</option>
+                            <option value="domains">Domains</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="type">Type *</label>
+                        <input type="text" id="type" name="type" required placeholder="e.g., shared, vps, dedicated">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="price">Price *</label>
+                        <input type="number" id="price" name="price" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="billing_cycle">Billing Cycle *</label>
+                        <select id="billing_cycle" name="billing_cycle" required>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="semi-annually">Semi-Annually</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="disk_space">Disk Space</label>
+                        <input type="text" id="disk_space" name="disk_space" placeholder="e.g., 10GB, Unlimited">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bandwidth">Bandwidth</label>
+                        <input type="text" id="bandwidth" name="bandwidth" placeholder="e.g., 1TB, Unlimited">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="databases">Databases</label>
+                        <input type="number" id="databases" name="databases" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email_accounts">Email Accounts</label>
+                        <input type="number" id="email_accounts" name="email_accounts" value="10">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subdomains">Subdomains</label>
+                        <input type="number" id="subdomains" name="subdomains" value="10">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ftp_accounts">FTP Accounts</label>
+                        <input type="number" id="ftp_accounts" name="ftp_accounts" value="5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="support_level">Support Level</label>
+                        <select id="support_level" name="support_level">
+                            <option value="basic">Basic</option>
+                            <option value="standard">Standard</option>
+                            <option value="priority">Priority</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="display_order">Display Order</label>
+                        <input type="number" id="display_order" name="display_order" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="ssl_certificates" name="ssl_certificates" value="1">
+                            <span>Free SSL Certificate</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="daily_backups" name="daily_backups" value="1">
+                            <span>Daily Backups</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group form-grid-full">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group form-grid-full">
+                        <label for="features">Features (one per line)</label>
+                        <textarea id="features" name="features" rows="5" placeholder="1 vCPU&#10;1GB RAM&#10;25GB SSD Storage"></textarea>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save Plan</button>
+                    <button type="button" onclick="closeModal()" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            document.getElementById('alertContainer').appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+        
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Plan';
+            document.getElementById('formAction').value = 'add';
+            document.getElementById('planForm').reset();
+            document.getElementById('planId').value = '';
+            document.getElementById('planModal').classList.add('active');
+        }
+        
+        function editPlan(plan) {
+            document.getElementById('modalTitle').textContent = 'Edit Plan';
+            document.getElementById('formAction').value = 'edit';
+            document.getElementById('planId').value = plan.id;
+            document.getElementById('name').value = plan.name;
+            document.getElementById('category').value = plan.category;
+            document.getElementById('type').value = plan.type;
+            document.getElementById('price').value = plan.price;
+            document.getElementById('billing_cycle').value = plan.billing_cycle;
+            document.getElementById('status').value = plan.status;
+            document.getElementById('disk_space').value = plan.disk_space || '';
+            document.getElementById('bandwidth').value = plan.bandwidth || '';
+            document.getElementById('databases').value = plan.databases || 1;
+            document.getElementById('email_accounts').value = plan.email_accounts || 10;
+            document.getElementById('subdomains').value = plan.subdomains || 10;
+            document.getElementById('ftp_accounts').value = plan.ftp_accounts || 5;
+            document.getElementById('support_level').value = plan.support_level || 'standard';
+            document.getElementById('display_order').value = plan.display_order || 0;
+            document.getElementById('ssl_certificates').checked = plan.ssl_certificates == 1;
+            document.getElementById('daily_backups').checked = plan.daily_backups == 1;
+            document.getElementById('description').value = plan.description || '';
+            
+            // Parse features from JSON array to newline-separated text
+            if (plan.features) {
+                try {
+                    const features = JSON.parse(plan.features);
+                    document.getElementById('features').value = features.join('\n');
+                } catch (e) {
+                    document.getElementById('features').value = plan.features;
+                }
+            }
+            
+            document.getElementById('planModal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('planModal').classList.remove('active');
+        }
+        
+        function deletePlan(id) {
+            if (!confirm('Are you sure you want to delete this plan?')) return;
+            
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('id', id);
+            
+            fetch('', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(err => showAlert('Error: ' + err.message, 'error'));
+        }
+        
+        document.getElementById('planForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Convert features textarea to JSON array
+            const featuresText = document.getElementById('features').value;
+            if (featuresText) {
+                const featuresArray = featuresText.split('\n').filter(f => f.trim());
+                formData.set('features', JSON.stringify(featuresArray));
+            } else {
+                formData.set('features', '[]');
+            }
+            
+            fetch('', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    closeModal();
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(err => showAlert('Error: ' + err.message, 'error'));
+        });
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        }
+    </script>
+    <script src="../assets/js/mobile-menu.js"></script>
+</body>
+</html>

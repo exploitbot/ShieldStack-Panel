@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../includes/auth.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once __DIR__ . '/../../panel/includes/auth.php';
+require_once __DIR__ . '/../../panel/includes/database.php';
 
 $auth = new Auth();
 $auth->requireAdmin();
@@ -111,7 +111,7 @@ $activePlans = $db->query("
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assign AI Plan - Admin</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="/panel/assets/css/style.css">
     <script>
         function updateTokenLimit() {
             const planType = document.getElementById('plan_type').value;
@@ -129,10 +129,10 @@ $activePlans = $db->query("
 </head>
 <body>
     <div class="dashboard-container">
-        <?php include '../../admin/includes/sidebar.php'; ?>
+        <?php include '../../panel/admin/includes/sidebar.php'; ?>
 
         <div class="main-content">
-            <?php include '../../admin/includes/topbar.php'; ?>
+            <?php include '../../panel/admin/includes/topbar.php'; ?>
 
             <div class="content-wrapper">
                 <div class="page-header">
@@ -343,5 +343,6 @@ $activePlans = $db->query("
             document.getElementById('addTokensModal').style.display = 'none';
         }
     </script>
+    <script src="/panel/assets/js/mobile-menu.js"></script>
 </body>
 </html>

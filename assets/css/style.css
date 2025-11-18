@@ -892,7 +892,6 @@ tr:hover {
 
 /* Mobile Overlay */
 .mobile-overlay {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -900,6 +899,7 @@ tr:hover {
     bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     z-index: 1999;
+    display: none;
 }
 
 .mobile-overlay.active {

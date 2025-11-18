@@ -1,5 +1,5 @@
 <?php
-// Redirect to login page
-header('Location: login.php');
+// Serve landing page directly
+header('Location: /index.html');
 exit;
 ?>

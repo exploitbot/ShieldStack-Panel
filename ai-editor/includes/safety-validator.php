@@ -12,7 +12,7 @@ class SafetyValidator {
     private $maxFileSizeMB = 5;
 
     public function __construct() {
-        require_once __DIR__ . '/../../includes/database.php';
+        require_once __DIR__ . '/../../panel/includes/database.php';
         $this->db = Database::getInstance()->getConnection();
         $this->loadSafetySettings();
     }

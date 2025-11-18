@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__ . '/../../includes/auth.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once __DIR__ . '/../../panel/includes/auth.php';
+require_once __DIR__ . '/../../panel/includes/database.php';
 require_once __DIR__ . '/../includes/encryption.php';
+require_once __DIR__ . '/../includes/ssh-manager.php';
 
 $auth = new Auth();
 $auth->requireAdmin();
@@ -90,6 +91,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } catch (Exception $e) {
                 $error = 'Error: ' . $e->getMessage();
             }
+        } elseif ($_POST['action'] === 'test_connection') {
+            try {
+                $credId = $_POST['cred_id'];
+                $stmt = $db->prepare("SELECT * FROM customer_ssh_credentials WHERE id = ?");
+                $stmt->execute([$credId]);
+                $cred = $stmt->fetch();
+
+                if (!$cred) {
+                    throw new Exception('SSH credential not found.');
+                }
+
+                $ssh = new SSHManager();
+                $ssh->connect($cred);
+
+                // Simple health check: current directory + web root existence
+                $pwdResult = $ssh->executeCommand('pwd');
+                $rootCheckCmd = 'if [ -d ' . escapeshellarg(rtrim($cred['web_root_path'], '/')) . ' ]; then echo WEBROOT_OK; else echo WEBROOT_MISSING; fi';
+                $rootResult = $ssh->executeCommand($rootCheckCmd);
+
+                $success = sprintf(
+                    'SSH test PASSED for %s@%s:%s — pwd: %s | webroot: %s',
+                    htmlspecialchars($cred['ssh_username']),
+                    htmlspecialchars($cred['ssh_host']),
+                    intval($cred['ssh_port']),
+                    trim($pwdResult['output']),
+                    trim($rootResult['output'])
+                );
+            } catch (Exception $e) {
+                $error = 'SSH test failed: ' . $e->getMessage();
+            }
         }
     }
 }
@@ -114,14 +145,14 @@ $customers = $db->query("SELECT id, full_name, email FROM customers ORDER BY ful
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage SSH Credentials - AI Editor Admin</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="/panel/assets/css/style.css">
 </head>
 <body>
     <div class="dashboard-container">
-        <?php include '../../admin/includes/sidebar.php'; ?>
+        <?php include '../../panel/admin/includes/sidebar.php'; ?>
 
         <div class="main-content">
-            <?php include '../../admin/includes/topbar.php'; ?>
+            <?php include '../../panel/admin/includes/topbar.php'; ?>
 
             <div class="content-wrapper">
                 <div class="page-header">
@@ -268,6 +299,11 @@ $customers = $db->query("SELECT id, full_name, email FROM customers ORDER BY ful
                                                 </td>
                                                 <td>
                                                     <form method="POST" style="display: inline;">
+                                                        <input type="hidden" name="action" value="test_connection">
+                                                        <input type="hidden" name="cred_id" value="<?php echo $cred['id']; ?>">
+                                                        <button type="submit" class="btn btn-sm btn-info">Test Connection</button>
+                                                    </form>
+                                                    <form method="POST" style="display: inline;">
                                                         <input type="hidden" name="action" value="toggle_status">
                                                         <input type="hidden" name="cred_id" value="<?php echo $cred['id']; ?>">
                                                         <button type="submit" class="btn btn-sm btn-secondary">
@@ -291,5 +327,6 @@ $customers = $db->query("SELECT id, full_name, email FROM customers ORDER BY ful
             </div>
         </div>
     </div>
+    <script src="/panel/assets/js/mobile-menu.js"></script>
 </body>
 </html>

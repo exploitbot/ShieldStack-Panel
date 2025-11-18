@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../panel/includes/auth.php';
+require_once __DIR__ . '/../panel/includes/database.php';
 
 $auth = new Auth();
 $auth->requireLogin();
@@ -64,10 +64,10 @@ $stats = $totalStats->fetch();
 </head>
 <body>
     <div class="dashboard-container">
-        <?php include '../includes/sidebar.php'; ?>
+        <?php include '../panel/includes/sidebar.php'; ?>
 
         <div class="main-content">
-            <?php include '../includes/topbar.php'; ?>
+            <?php include '../panel/includes/topbar.php'; ?>
 
             <div class="content-wrapper">
                 <div class="page-header">
@@ -256,5 +256,6 @@ $stats = $totalStats->fetch();
             </div>
         </div>
     </div>
+    <script src="/panel/assets/js/mobile-menu.js"></script>
 </body>
 </html>

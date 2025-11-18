@@ -1,12 +1,16 @@
 <?php
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../panel/includes/auth.php';
+require_once __DIR__ . '/../panel/includes/database.php';
 
 $auth = new Auth();
 $auth->requireLogin();
 
 $db = Database::getInstance()->getConnection();
 $customerId = $auth->getCurrentCustomerId();
+
+// DEBUG: Show customer info
+echo "<!-- DEBUG: Customer ID = " . htmlspecialchars($customerId ?? 'null') . " -->\n";
+echo "<!-- DEBUG: Customer Email = " . htmlspecialchars($_SESSION['customer_email'] ?? 'not set') . " -->\n";
 
 // Check if customer has an active AI plan
 $stmt = $db->prepare("
@@ -17,6 +21,12 @@ $stmt = $db->prepare("
 ");
 $stmt->execute([$customerId]);
 $aiPlan = $stmt->fetch();
+
+// DEBUG: Show AI plan result
+echo "<!-- DEBUG: AI Plan found = " . ($aiPlan ? 'Yes' : 'No') . " -->\n";
+if ($aiPlan) {
+    echo "<!-- DEBUG: Plan type = " . htmlspecialchars($aiPlan['plan_type']) . ", Status = " . htmlspecialchars($aiPlan['status']) . " -->\n";
+}
 
 if (!$aiPlan) {
     // No active plan - show upgrade message
@@ -31,9 +41,9 @@ if (!$aiPlan) {
     </head>
     <body>
         <div class="dashboard-container">
-            <?php include '../includes/sidebar.php'; ?>
+            <?php include '../panel/includes/sidebar.php'; ?>
             <div class="main-content">
-                <?php include '../includes/topbar.php'; ?>
+                <?php include '../panel/includes/topbar.php'; ?>
                 <div class="content-wrapper">
                     <div class="page-header">
                         <h1 class="page-title">🤖 AI Website Editor</h1>
@@ -75,9 +85,9 @@ if (!$sshCredentials) {
     </head>
     <body>
         <div class="dashboard-container">
-            <?php include '../includes/sidebar.php'; ?>
+            <?php include '../panel/includes/sidebar.php'; ?>
             <div class="main-content">
-                <?php include '../includes/topbar.php'; ?>
+                <?php include '../panel/includes/topbar.php'; ?>
                 <div class="content-wrapper">
                     <div class="page-header">
                         <h1 class="page-title">🤖 AI Website Editor</h1>
@@ -115,10 +125,10 @@ $tokensRemaining = $aiPlan['token_limit'] > 0 ?
 </head>
 <body>
     <div class="dashboard-container">
-        <?php include '../includes/sidebar.php'; ?>
+        <?php include '../panel/includes/sidebar.php'; ?>
 
         <div class="main-content">
-            <?php include '../includes/topbar.php'; ?>
+            <?php include '../panel/includes/topbar.php'; ?>
 
             <div class="content-wrapper">
                 <div class="page-header">
@@ -201,5 +211,6 @@ $tokensRemaining = $aiPlan['token_limit'] > 0 ?
     </div>
 
     <script src="assets/js/chat-interface.js"></script>
+    <script src="/panel/assets/js/mobile-menu.js"></script>
 </body>
 </html>

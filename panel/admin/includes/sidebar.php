@@ -1,0 +1,163 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+        <svg width="35" height="35" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2L4 10V18C4 27.5 10.5 36.1 20 38C29.5 36.1 36 27.5 36 18V10L20 2Z" stroke="#00d4ff" stroke-width="2" fill="rgba(0,212,255,0.1)"/>
+            <path d="M20 12V28M14 20H26" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <h2>Admin Panel</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Dashboard</div>
+            <a href="/panel/admin/dashboard.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
+                <span class="nav-icon">📊</span>
+                <span>Overview</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Management</div>
+            <a href="/panel/admin/manage-users.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'manage-users.php' || basename($_SERVER['PHP_SELF']) == 'user-services.php' ? 'active' : ''; ?>">
+                <span class="nav-icon">👥</span>
+                <span>Manage Users</span>
+            </a>
+            
+            <!-- Products Submenu -->
+            <div class="nav-item-submenu">
+                <a href="#" class="nav-item nav-parent <?php echo (basename($_SERVER['PHP_SELF']) == 'manage-plans.php' || basename($_SERVER['PHP_SELF']) == 'manage-categories.php') ? 'active' : ''; ?>" onclick="toggleSubmenu(event, 'products-submenu')">
+                    <span class="nav-icon">📦</span>
+                    <span>Products & Services</span>
+                    <span class="submenu-arrow">›</span>
+                </a>
+                <div id="products-submenu" class="submenu <?php echo (basename($_SERVER['PHP_SELF']) == 'manage-plans.php' || basename($_SERVER['PHP_SELF']) == 'manage-categories.php') ? 'show' : ''; ?>">
+                    <a href="/panel/admin/manage-plans.php" class="nav-item submenu-item <?php echo basename($_SERVER['PHP_SELF']) == 'manage-plans.php' ? 'active' : ''; ?>">
+                        <span class="nav-icon">📋</span>
+                        <span>Manage Plans</span>
+                    </a>
+                    <a href="/panel/admin/manage-categories.php" class="nav-item submenu-item <?php echo basename($_SERVER['PHP_SELF']) == 'manage-categories.php' ? 'active' : ''; ?>">
+                        <span class="nav-icon">🏷️</span>
+                        <span>Manage Categories</span>
+                    </a>
+                </div>
+            </div>
+
+            <a href="/panel/admin/manage-departments.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'manage-departments.php' ? 'active' : ''; ?>">
+                <span class="nav-icon">🎫</span>
+                <span>Ticket Departments</span>
+            </a>
+            <a href="/panel/admin/tickets.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'tickets.php' ? 'active' : ''; ?>">
+                <span class="nav-icon">💬</span>
+                <span>All Tickets</span>
+            </a>
+            <a href="/panel/admin/invoices.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'invoices.php' || basename($_SERVER['PHP_SELF']) == 'create-invoice.php' ? 'active' : ''; ?>">
+                <span class="nav-icon">💳</span>
+                <span>Manage Invoices</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Settings</div>
+            <a href="/panel/admin/email-settings.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'email-settings.php' ? 'active' : ''; ?>">
+                <span class="nav-icon">✉️</span>
+                <span>Email Settings</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">AI Website Editor</div>
+            <a href="/ai-editor/admin/" class="nav-item">
+                <span class="nav-icon">🤖</span>
+                <span>AI Editor Admin</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Navigation</div>
+            <a href="/panel/dashboard.php" class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span>Client Panel</span>
+            </a>
+            <a href="/panel/logout.php" class="nav-item">
+                <span class="nav-icon">🚪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<style>
+.nav-item-submenu {
+    position: relative;
+}
+
+.nav-parent {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+}
+
+.submenu-arrow {
+    transition: transform 0.3s ease;
+    margin-left: auto;
+    font-size: 1.2rem;
+}
+
+.nav-parent.open .submenu-arrow {
+    transform: rotate(90deg);
+}
+
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 20px;
+}
+
+.submenu.show {
+    max-height: 200px;
+}
+
+.submenu-item {
+    padding-left: 30px;
+    font-size: 0.9rem;
+}
+
+.submenu-item .nav-icon {
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+function toggleSubmenu(event, submenuId) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const submenu = document.getElementById(submenuId);
+    const parent = event.currentTarget;
+    
+    if (submenu.classList.contains('show')) {
+        submenu.classList.remove('show');
+        parent.classList.remove('open');
+    } else {
+        // Close all other submenus
+        document.querySelectorAll('.submenu').forEach(s => s.classList.remove('show'));
+        document.querySelectorAll('.nav-parent').forEach(p => p.classList.remove('open'));
+        
+        // Open this submenu
+        submenu.classList.add('show');
+        parent.classList.add('open');
+    }
+}
+
+// Auto-open submenu if on a submenu page
+document.addEventListener('DOMContentLoaded', function() {
+    const activeSubmenu = document.querySelector('.submenu.show');
+    if (activeSubmenu) {
+        const parent = activeSubmenu.previousElementSibling;
+        if (parent && parent.classList.contains('nav-parent')) {
+            parent.classList.add('open');
+        }
+    }
+});
+</script>
