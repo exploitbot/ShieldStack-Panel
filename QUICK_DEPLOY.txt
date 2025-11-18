@@ -1,0 +1,66 @@
+========================================
+QUICK DEPLOYMENT TO SHIELDSTACK.DEV
+========================================
+
+OPTION 1: Automated Deployment (Recommended)
+---------------------------------------------
+Copy and paste this command into your server terminal:
+
+ssh root@shieldstack.dev "cd /tmp && wget -q https://raw.githubusercontent.com/exploitbot/ShieldStack-Panel/claude/ai-website-editor-013swgdc52HzjLpgktvnGwxx/deploy-to-production.sh && chmod +x deploy-to-production.sh && bash deploy-to-production.sh"
+
+Password: jinho2310
+
+
+OPTION 2: Manual Step-by-Step
+------------------------------
+1. SSH into server:
+   ssh root@shieldstack.dev
+
+2. Navigate to web directory:
+   cd /var/www/html
+
+3. Pull latest code:
+   git checkout claude/ai-website-editor-013swgdc52HzjLpgktvnGwxx
+   git pull origin claude/ai-website-editor-013swgdc52HzjLpgktvnGwxx
+
+4. Set up database config:
+   cp includes/config.example.php includes/config.php
+   sed -i "s/'localhost'/getenv('DB_HOST') ?: 'localhost'/g" includes/config.php
+
+5. Import database schemas:
+   mysql -uroot -pjinho2310 shieldstack_panel < database_schema.sql
+   mysql -uroot -pjinho2310 shieldstack_panel < ai_editor_migration.sql
+
+6. Set permissions:
+   chown -R www-data:www-data /var/www/html
+   chmod 600 includes/config.php
+
+7. Configure AI Editor:
+   cp ai-editor/config.production.php ai-editor/config.php
+   nano ai-editor/config.php  # Add OpenAI API key
+
+
+AFTER DEPLOYMENT
+----------------
+1. Visit: https://shieldstack.dev
+2. Login: eric@shieldstack.dev / jinho2310
+3. Test AI Editor: https://shieldstack.dev/ai-editor
+4. Check admin panel for AI Editor settings
+
+
+TROUBLESHOOTING
+---------------
+View logs:
+  tail -f /var/log/apache2/error.log
+
+Test database:
+  mysql -uroot -pjinho2310 shieldstack_panel -e "SHOW TABLES;"
+
+Check PHP:
+  php -v
+  php -m | grep ssh2
+
+
+DETAILED DOCS
+-------------
+See: DEPLOY_SHIELDSTACK_DEV.md for full instructions
