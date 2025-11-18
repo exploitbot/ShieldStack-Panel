@@ -7,10 +7,11 @@
 
 return [
     // OpenAI API Configuration
+    // Reads from environment variables (for Vercel, Docker, etc.) with fallback defaults
     'openai' => [
-        'endpoint' => 'https://api.openai.com/v1/chat/completions',  // Your OpenAI-compatible endpoint
-        'api_key' => '',  // Your API key
-        'model' => 'gpt-4',  // Model to use (gpt-4, gpt-3.5-turbo, or your custom model)
+        'endpoint' => getenv('AI_OPENAI_ENDPOINT') ?: 'https://api.openai.com/v1/chat/completions',
+        'api_key' => getenv('AI_OPENAI_KEY') ?: '',  // REQUIRED: Set AI_OPENAI_KEY environment variable
+        'model' => getenv('AI_OPENAI_MODEL') ?: 'gpt-4',
     ],
 
     // Plan Configurations

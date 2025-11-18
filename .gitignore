@@ -1,6 +1,7 @@
 # Environment & Config
 .env
 includes/config.php
+ai-editor/config.php
 
 # IDE & Editors
 .vscode/
