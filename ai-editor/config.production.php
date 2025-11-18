@@ -7,11 +7,13 @@
  */
 
 return [
-    // OpenAI API Configuration
+    // OpenAI-Compatible API Configuration
+    // For shieldstack.dev production: using Claude via custom proxy
     'openai' => [
-        'endpoint' => 'https://api.openai.com/v1/chat/completions',
-        'api_key' => '',  // TODO: ADD YOUR OPENAI API KEY HERE!
-        'model' => 'gpt-4',  // or 'gpt-3.5-turbo' for lower costs
+        'endpoint' => 'https://clove.shieldstack.dev/v1/chat/completions',  // Custom endpoint
+        'api_key' => 'eric',  // API key for custom endpoint
+        'model' => 'claude-sonnet-4-5-20250929',  // Claude model via proxy
+        // For standard OpenAI use: 'gpt-4' or 'gpt-3.5-turbo'
     ],
 
     // Plan Configurations
