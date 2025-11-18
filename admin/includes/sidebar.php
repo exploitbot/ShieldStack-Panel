@@ -42,6 +42,33 @@
                 </div>
             </div>
 
+            <!-- AI Editor Submenu -->
+            <div class="nav-item-submenu">
+                <a href="#" class="nav-item nav-parent <?php echo strpos($_SERVER['PHP_SELF'], '../ai-editor/admin') !== false ? 'active' : ''; ?>" onclick="toggleSubmenu(event, 'ai-editor-submenu')">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI Website Editor</span>
+                    <span class="submenu-arrow">›</span>
+                </a>
+                <div id="ai-editor-submenu" class="submenu <?php echo strpos($_SERVER['PHP_SELF'], '../ai-editor/admin') !== false ? 'show' : ''; ?>">
+                    <a href="../ai-editor/admin/index.php" class="nav-item submenu-item">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="../ai-editor/admin/assign-plan.php" class="nav-item submenu-item">
+                        <span class="nav-icon">📦</span>
+                        <span>Assign Plans</span>
+                    </a>
+                    <a href="../ai-editor/admin/manage-ssh.php" class="nav-item submenu-item">
+                        <span class="nav-icon">🔐</span>
+                        <span>SSH Credentials</span>
+                    </a>
+                    <a href="../ai-editor/admin/view-logs.php" class="nav-item submenu-item">
+                        <span class="nav-icon">📝</span>
+                        <span>View Logs</span>
+                    </a>
+                </div>
+            </div>
+
             <a href="manage-departments.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'manage-departments.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">🎫</span>
                 <span>Ticket Departments</span>

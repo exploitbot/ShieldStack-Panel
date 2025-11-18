@@ -41,6 +41,14 @@
         </div>
 
         <div class="nav-section">
+            <div class="nav-section-title">AI Tools</div>
+            <a href="ai-editor/index.php" class="nav-item <?php echo strpos($_SERVER['PHP_SELF'], 'ai-editor') !== false ? 'active' : ''; ?>">
+                <span class="nav-icon">🤖</span>
+                <span>AI Website Editor</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
             <div class="nav-section-title">Support</div>
             <a href="tickets.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'tickets.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">🎫</span>
