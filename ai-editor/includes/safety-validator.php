@@ -116,11 +116,27 @@ class SafetyValidator {
             ];
         }
 
-        // Check for command chaining attempts
+        // Check for command chaining attempts (;, &, |, &&, ||)
         if (preg_match('/[;&|]/', $command)) {
             return [
                 'valid' => false,
                 'reason' => 'Command chaining not allowed (;, &, |)'
+            ];
+        }
+
+        // Check for command substitution ($(), backticks)
+        if (preg_match('/\$\(|\`/', $command)) {
+            return [
+                'valid' => false,
+                'reason' => 'Command substitution not allowed ($(), backticks)'
+            ];
+        }
+
+        // Check for newlines (could enable command injection)
+        if (preg_match('/[\r\n]/', $command)) {
+            return [
+                'valid' => false,
+                'reason' => 'Newlines not allowed in commands'
             ];
         }
 
@@ -129,6 +145,14 @@ class SafetyValidator {
             return [
                 'valid' => false,
                 'reason' => 'Command redirection not allowed'
+            ];
+        }
+
+        // Check for multiple spaces (could hide malicious commands)
+        if (preg_match('/\s{2,}/', $command)) {
+            return [
+                'valid' => false,
+                'reason' => 'Multiple consecutive spaces not allowed'
             ];
         }
 
@@ -161,6 +185,15 @@ class SafetyValidator {
             return ['valid' => false, 'reason' => 'Directory traversal detected (..)'];
         }
 
+        // Check for URL-encoded traversal attempts
+        if (preg_match('/%2e%2e|%252e%252e|\.\.%2f|\.\.%5c/i', $path)) {
+            return ['valid' => false, 'reason' => 'URL-encoded path traversal detected'];
+        }
+
+        // Normalize path: remove duplicate slashes
+        $path = preg_replace('#/+#', '/', $path);
+        $path = rtrim($path, '/');
+
         // Convert to absolute path if relative
         if ($path[0] !== '/') {
             $path = $webRoot . '/' . ltrim($path, '/');
@@ -172,6 +205,14 @@ class SafetyValidator {
                 'valid' => false,
                 'reason' => "Path is outside web root. Path: {$path}, Web Root: {$webRoot}"
             ];
+        }
+
+        // Additional check: ensure no path component is '..' or '.'
+        $pathParts = explode('/', $path);
+        foreach ($pathParts as $part) {
+            if ($part === '..' || $part === '.') {
+                return ['valid' => false, 'reason' => 'Invalid path component detected'];
+            }
         }
 
         // Check for sensitive files

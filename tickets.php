@@ -2,6 +2,7 @@
 require_once 'includes/auth.php';
 require_once 'includes/database.php';
 require_once 'includes/email.php';
+require_once 'includes/csrf.php';
 
 $auth = new Auth();
 $auth->requireLogin();
@@ -14,12 +15,16 @@ $error = '';
 
 // Handle new ticket creation with auto-response
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_ticket'])) {
-    $subject = $_POST['subject'] ?? '';
-    $departmentId = $_POST['department_id'] ?? 1;
-    $priority = $_POST['priority'] ?? 'medium';
-    $message = $_POST['message'] ?? '';
+    // Validate CSRF token
+    if (!CSRFProtection::validateToken()) {
+        $error = 'Security validation failed. Please try again.';
+    } else {
+        $subject = $_POST['subject'] ?? '';
+        $departmentId = $_POST['department_id'] ?? 1;
+        $priority = $_POST['priority'] ?? 'medium';
+        $message = $_POST['message'] ?? '';
 
-    if ($subject && $departmentId && $message) {
+        if ($subject && $departmentId && $message) {
         try {
             $db->beginTransaction();
 
@@ -57,14 +62,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_ticket'])) {
     } else {
         $error = 'Please fill in all required fields.';
     }
+    }
 }
 
 // Handle client reply
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_reply'])) {
-    $ticketId = $_POST['ticket_id'] ?? 0;
-    $message = $_POST['reply_message'] ?? '';
-    
-    if ($ticketId && $message) {
+    // Validate CSRF token
+    if (!CSRFProtection::validateToken()) {
+        $error = 'Security validation failed. Please try again.';
+    } else {
+        $ticketId = $_POST['ticket_id'] ?? 0;
+        $message = $_POST['reply_message'] ?? '';
+
+        if ($ticketId && $message) {
         $replyStmt = $db->prepare("INSERT INTO ticket_replies (ticket_id, customer_id, message) VALUES (?, ?, ?)");
         if ($replyStmt->execute([$ticketId, $customerId, $message])) {
             // Update ticket to awaiting_admin
@@ -77,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_reply'])) {
 
             $success = 'Reply added successfully!';
         }
+    }
     }
 }
 
@@ -137,6 +148,7 @@ $tickets = $ticketsStmt->fetchAll();
                     </div>
                     <div class="card-body">
                         <form method="POST">
+                            <?php CSRFProtection::tokenField(); ?>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                                 <div class="form-group">
                                     <label for="subject">Subject *</label>
@@ -265,6 +277,13 @@ $tickets = $ticketsStmt->fetchAll();
 
     <script src="assets/js/mobile-menu.js"></script>
     <script>
+        // Helper function to escape HTML and prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function viewTicket(ticketId) {
             fetch('api/get-ticket.php?id=' + ticketId)
                 .then(response => response.json())
@@ -280,25 +299,25 @@ $tickets = $ticketsStmt->fetchAll();
 
         function displayTicket(ticket, replies) {
             let html = '<div style="margin-bottom:20px;">';
-            html += '<p><strong>Subject:</strong> ' + ticket.subject + '</p>';
-            html += '<p><strong>Department:</strong> ' + (ticket.department_name || 'N/A') + '</p>';
-            html += '<p><strong>Status:</strong> <span class="badge">' + ticket.status + '</span></p>';
-            html += '<p><strong>Priority:</strong> <span class="badge">' + ticket.priority + '</span></p>';
+            html += '<p><strong>Subject:</strong> ' + escapeHtml(ticket.subject) + '</p>';
+            html += '<p><strong>Department:</strong> ' + escapeHtml(ticket.department_name || 'N/A') + '</p>';
+            html += '<p><strong>Status:</strong> <span class="badge">' + escapeHtml(ticket.status) + '</span></p>';
+            html += '<p><strong>Priority:</strong> <span class="badge">' + escapeHtml(ticket.priority) + '</span></p>';
             html += '</div>';
 
             html += '<div style="max-height:400px;overflow-y:auto;margin-bottom:20px;">';
             replies.forEach(reply => {
                 let isAdmin = reply.admin_id != null;
                 html += '<div style="background:' + (isAdmin ? 'var(--surface-light)' : 'var(--background)') + ';padding:15px;margin-bottom:10px;border-radius:6px;">';
-                html += '<strong>' + (isAdmin ? 'Support Team' : 'You') + '</strong> <small>' + reply.created_at + '</small><br>';
-                html += '<p style="margin-top:10px;">' + reply.message.replace(/\n/g, '<br>') + '</p>';
+                html += '<strong>' + (isAdmin ? 'Support Team' : 'You') + '</strong> <small>' + escapeHtml(reply.created_at) + '</small><br>';
+                html += '<p style="margin-top:10px;">' + escapeHtml(reply.message).replace(/\n/g, '<br>') + '</p>';
                 html += '</div>';
             });
             html += '</div>';
 
             if (ticket.status !== 'closed' && ticket.status !== 'resolved') {
                 html += '<form method="POST">';
-                html += '<input type="hidden" name="ticket_id" value="' + ticket.id + '">';
+                html += '<input type="hidden" name="ticket_id" value="' + escapeHtml(String(ticket.id)) + '">';
                 html += '<div class="form-group"><label>Add Reply:</label>';
                 html += '<textarea name="reply_message" required rows="4" style="width:100%;"></textarea></div>';
                 html += '<button type="submit" name="add_reply" class="btn btn-primary">Send Reply</button> ';

@@ -32,8 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         if ($result['is_admin']) {
             header('Location: admin/dashboard.php');
         } else {
-            // Redirect to original requested page or dashboard
-            header('Location: ' . $redirectAfterLogin);
+            // Validate redirect URL to prevent open redirects
+            // Only allow relative URLs within this application
+            $safeRedirect = 'dashboard.php';  // Default
+
+            if (!empty($redirectAfterLogin)) {
+                // Remove any absolute URL schemes
+                $redirectAfterLogin = preg_replace('#^https?://#i', '', $redirectAfterLogin);
+
+                // Check if it's a relative path (starts with / or is just a page name)
+                if (preg_match('#^[a-zA-Z0-9/_.-]+\.php(\?[^/]*)?$#', $redirectAfterLogin)) {
+                    // Remove any attempts to go up directories
+                    if (strpos($redirectAfterLogin, '..') === false) {
+                        $safeRedirect = $redirectAfterLogin;
+                    }
+                }
+            }
+
+            header('Location: ' . $safeRedirect);
         }
         exit;
     } else {

@@ -1,6 +1,7 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/database.php';
+require_once 'includes/csrf.php';
 
 $auth = new Auth();
 $auth->requireLogin();
@@ -18,25 +19,30 @@ $customer = $stmt->fetch();
 
 // Handle profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-    $fullName = $_POST['full_name'] ?? '';
-    $company = $_POST['company'] ?? null;
-    $phone = $_POST['phone'] ?? null;
-    $address = $_POST['address'] ?? null;
+    // Validate CSRF token
+    if (!CSRFProtection::validateToken()) {
+        $error = 'Security validation failed. Please try again.';
+    } else {
+        $fullName = $_POST['full_name'] ?? '';
+        $company = $_POST['company'] ?? null;
+        $phone = $_POST['phone'] ?? null;
+        $address = $_POST['address'] ?? null;
 
-    try {
-        $updateStmt = $db->prepare("
-            UPDATE customers
-            SET full_name = ?, company = ?, phone = ?, address = ?
-            WHERE id = ?
-        ");
-        $updateStmt->execute([$fullName, $company, $phone, $address, $customerId]);
-        $success = 'Profile updated successfully!';
+        try {
+            $updateStmt = $db->prepare("
+                UPDATE customers
+                SET full_name = ?, company = ?, phone = ?, address = ?
+                WHERE id = ?
+            ");
+            $updateStmt->execute([$fullName, $company, $phone, $address, $customerId]);
+            $success = 'Profile updated successfully!';
 
-        // Refresh customer data
-        $stmt->execute([$customerId]);
-        $customer = $stmt->fetch();
-    } catch (PDOException $e) {
-        $error = 'Failed to update profile: ' . $e->getMessage();
+            // Refresh customer data
+            $stmt->execute([$customerId]);
+            $customer = $stmt->fetch();
+        } catch (PDOException $e) {
+            $error = 'Failed to update profile: ' . $e->getMessage();
+        }
     }
 }
 ?>
@@ -73,6 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                     </div>
                     <div class="card-body">
                         <form method="POST">
+                            <?php CSRFProtection::tokenField(); ?>
                             <div class="form-group">
                                 <label for="email">Email Address</label>
                                 <input type="email" id="email" value="<?php echo htmlspecialchars($customer['email']); ?>" disabled>

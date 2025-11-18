@@ -276,23 +276,39 @@ class SSHManager {
      * @return bool Path is safe
      */
     private function isPathSafe($path) {
-        // Resolve to absolute path
-        $realPath = realpath($path) ?: $path;
+        // Check for null bytes
+        if (strpos($path, "\0") !== false) {
+            return false;
+        }
 
-        // Check if path starts with web root
-        if (strpos($realPath, $this->web_root) !== 0) {
-            // For remote paths, do a simple check
-            if (strpos($path, '..') !== false) {
-                return false;
-            }
+        // Check for directory traversal patterns
+        if (strpos($path, '..') !== false) {
+            return false;
+        }
 
-            if (strpos($path, $this->web_root) !== 0 && $path[0] !== '/') {
-                // Relative path, prepend web root
-                $path = $this->web_root . '/' . ltrim($path, '/');
-            }
+        // Check for encoded traversal attempts
+        if (preg_match('/%2e%2e|%252e%252e|\.\.%2f|\.\.%5c/i', $path)) {
+            return false;
+        }
 
-            // Check again after normalization
-            if (strpos($path, $this->web_root) !== 0) {
+        // Normalize path: remove duplicate slashes, trailing slash
+        $path = preg_replace('#/+#', '/', $path);
+        $path = rtrim($path, '/');
+
+        // Convert relative paths to absolute
+        if ($path[0] !== '/') {
+            $path = $this->web_root . '/' . ltrim($path, '/');
+        }
+
+        // Check if normalized path starts with web root
+        if (strpos($path, $this->web_root) !== 0) {
+            return false;
+        }
+
+        // Additional check: ensure no path component is '..'
+        $pathParts = explode('/', $path);
+        foreach ($pathParts as $part) {
+            if ($part === '..' || $part === '.') {
                 return false;
             }
         }
