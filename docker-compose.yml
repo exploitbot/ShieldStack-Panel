@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: shieldstack-web
+    ports:
+      - "8080:80"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=shieldstack_panel
+      - DB_USER=shieldstack
+      - DB_PASS=shieldstack_password
+      - AI_OPENAI_ENDPOINT=${AI_OPENAI_ENDPOINT:-https://api.openai.com/v1/chat/completions}
+      - AI_OPENAI_KEY=${AI_OPENAI_KEY:-your-api-key-here}
+      - AI_SSH_ENCRYPTION_KEY=${AI_SSH_ENCRYPTION_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/var/www/html
+    networks:
+      - shieldstack-network
+
+  db:
+    image: mysql:8.0
+    container_name: shieldstack-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shieldstack_panel
+      MYSQL_USER: shieldstack
+      MYSQL_PASSWORD: shieldstack_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database_schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./ai_editor_migration.sql:/docker-entrypoint-initdb.d/2-ai-editor.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - shieldstack-network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: shieldstack-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=rootpassword
+    depends_on:
+      - db
+    networks:
+      - shieldstack-network
+
+volumes:
+  db_data:
+
+networks:
+  shieldstack-network:
+    driver: bridge

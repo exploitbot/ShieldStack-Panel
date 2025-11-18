@@ -1,61 +1,42 @@
-# Configuration Files (IMPORTANT: Never commit real credentials)
+# Environment & Config
+.env
 includes/config.php
 
-# Backup Files
-*.backup
-*.backup2
-*.backup3
-*.bak
-
-# Test Files
-test_*.php
-*_debug.php
-
-# Vendor Libraries (download separately)
-vendor/phpmailer/
-
-# System Files
-.DS_Store
-Thumbs.db
-.idea/
+# IDE & Editors
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
+.DS_Store
+
+# Dependencies
+vendor/
+node_modules/
 
 # Logs
 *.log
-error_log
-debug.log
+/tmp/
+/logs/
 
-# Cache
-cache/
-tmp/
+# Database
+*.sql.gz
+*.sql.backup
 
-# Upload Directories (user uploads)
+# Uploaded Files
 uploads/
-attachments/
+temp/
 
-# Environment Files
-.env
-.env.local
+# Build & Cache
+.cache/
+dist/
+build/
 
-# Documentation Drafts (keep final docs)
-*_DRAFT.md
-IMPLEMENTATION_REPORT*.md
-*_SUMMARY.md
-ENHANCEMENTS.md
-TESTING_CHECKLIST.md
-TESTING_GUIDE.txt
+# OS Files
+Thumbs.db
+desktop.ini
 
-# Database Dumps with Data (schema is OK)
-*_dump.sql
-*_backup_*.sql
-
-# Composer
-composer.phar
-composer.lock
-
-# NPM/Node
-node_modules/
-package-lock.json
+# Backup files
+*.bak
+*~
+.ai_backups/
