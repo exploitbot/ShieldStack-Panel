@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>ShieldStack Blog - DDoS Attack Insights & Cybersecurity News | Est. 2021</title>
+    <meta name="title" content="ShieldStack Blog - DDoS Attack Insights & Cybersecurity News">
+    <meta name="description" content="Expert insights on DDoS attacks, cybersecurity threats, and defensive strategies. Latest news, opinions, and analysis from certified security professionals. Learn about DDoS mitigation, attack trends, and protection methods.">
+    <meta name="keywords" content="DDoS attacks, cybersecurity blog, DDoS mitigation, network security, DDoS protection, cyber threats, security news, DDoS defense, botnet attacks, application layer attacks, volumetric attacks, cybersecurity insights">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="ShieldStack LLC">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://shieldstack.dev/blog/">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shieldstack.dev/blog/">
+    <meta property="og:title" content="ShieldStack Blog - DDoS Attacks & Cybersecurity Insights">
+    <meta property="og:description" content="Expert insights on DDoS attacks, threat analysis, and cybersecurity defense strategies from certified professionals.">
+    <meta property="og:image" content="https://shieldstack.dev/blog-og.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://shieldstack.dev/blog/">
+    <meta name="twitter:title" content="ShieldStack Blog - DDoS & Cybersecurity">
+    <meta name="twitter:description" content="Expert insights on DDoS attacks and cybersecurity threats.">
+    
+    <link id="theme-stylesheet" rel="stylesheet" href="../styles.css">
+    <style>
+        /* Blog-specific styles */
+        .blog-hero {
+            padding: 150px 0 80px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(5, 8, 22, 0.95) 100%);
+        }
+        
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+        
+        .blog-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 60px rgba(0, 255, 136, 0.2);
+        }
+        
+        .blog-image {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0096ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .blog-image::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 0, 0, 0.1) 10px,
+                rgba(0, 0, 0, 0.1) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+        
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50%, 50%); }
+        }
+        
+        .blog-content {
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .blog-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+        
+        .blog-category {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--primary-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .blog-date {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .blog-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            line-height: 1.3;
+        }
+        
+        .blog-card h3 a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .blog-card h3 a:hover {
+            color: #00d4aa;
+        }
+        
+        .blog-excerpt {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+        
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .read-more:hover {
+            gap: 1rem;
+            color: #00d4aa;
+        }
+        
+        .blog-stats {
+            display: flex;
+            gap: 1.5rem;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .blog-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary-color);
+            color: var(--dark-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .blog-hero {
+                padding: 120px 0 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ShieldStack Logo">
+                    <path d="M20 2L4 10V18C4 27.5 10.5 36.1 20 38C29.5 36.1 36 27.5 36 18V10L20 2Z" stroke="#00d4ff" stroke-width="2" fill="rgba(0,212,255,0.1)"/>
+                    <path d="M20 12V28M14 20H26" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>ShieldStack</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/#services">Services</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/#contact">Contact</a></li>
+                <li><button class="theme-toggle">✨ Switch to Modern Theme</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="blog-hero">
+        <div class="container">
+            <div class="badge">Security Insights & Analysis</div>
+            <h1 class="glitch" data-text="ShieldStack Blog">ShieldStack Blog</h1>
+            <p class="subtitle">DDoS Attacks, Threats & Cybersecurity Defense</p>
+            <p class="description">Expert insights, news, and opinions on DDoS attacks, emerging cyber threats, and defensive strategies from our team of certified security professionals.</p>
+        </div>
+    </section>
+
+    <section class="services" style="padding-top: 80px;">
+        <div class="container">
+            <h2 class="section-title">Latest Articles</h2>
+            <p class="section-subtitle">Deep dives into DDoS attacks, threat analysis, and security best practices</p>
+            
+            <div class="blog-grid">
+                <!-- Featured Post -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <div class="featured-badge">⭐ Featured</div>
+                        <span>🛡️</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">DDoS Analysis</span>
+                            <span class="blog-date">📅 October 14, 2025</span>
+                        </div>
+                        <h3><a href="posts/rise-of-application-layer-ddos-attacks.html">The Rise of Application-Layer DDoS Attacks in 2025</a></h3>
+                        <p class="blog-excerpt">Layer 7 DDoS attacks have increased by 340% in 2025, targeting web applications with sophisticated techniques. We analyze the latest attack vectors, real-world case studies, and effective mitigation strategies for modern application-layer threats.</p>
+                        <a href="posts/rise-of-application-layer-ddos-attacks.html" class="read-more">Read Full Article →</a>
+                        <div class="blog-stats">
+                            <span class="blog-stat">⏱️ 8 min read</span>
+                            <span class="blog-stat">👁️ 2.4K views</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <span>⚡</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Threat Intelligence</span>
+                            <span class="blog-date">📅 October 10, 2025</span>
+                        </div>
+                        <h3><a href="posts/volumetric-ddos-attacks-terabit-era.html">Volumetric DDoS: Welcome to the Terabit Era</a></h3>
+                        <p class="blog-excerpt">Recent attacks have exceeded 3.5 Tbps, overwhelming even enterprise-grade infrastructure. This article explores how botnets achieve these massive volumes, the economics behind DDoS-for-hire services, and next-generation defense mechanisms.</p>
+                        <a href="posts/volumetric-ddos-attacks-terabit-era.html" class="read-more">Read Full Article →</a>
+                        <div class="blog-stats">
+                            <span class="blog-stat">⏱️ 10 min read</span>
+                            <span class="blog-stat">👁️ 1.8K views</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 3 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <span>🤖</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Opinion</span>
+                            <span class="blog-date">📅 October 7, 2025</span>
+                        </div>
+                        <h3><a href="posts/ai-powered-ddos-attacks-reality-check.html">AI-Powered DDoS Attacks: Hype vs Reality</a></h3>
+                        <p class="blog-excerpt">Everyone's talking about AI-enhanced DDoS attacks, but what's actually happening? Our analysis separates fact from fiction, examining real AI applications in attack automation and what defenders should actually be worried about.</p>
+                        <a href="posts/ai-powered-ddos-attacks-reality-check.html" class="read-more">Read Full Article →</a>
+                        <div class="blog-stats">
+                            <span class="blog-stat">⏱️ 6 min read</span>
+                            <span class="blog-stat">👁️ 3.1K views</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 4 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <span>🌐</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Case Study</span>
+                            <span class="blog-date">📅 October 3, 2025</span>
+                        </div>
+                        <h3><a href="posts/cloudflare-outage-ddos-lessons-learned.html">October CloudFlare Outage: What Went Wrong</a></h3>
+                        <p class="blog-excerpt">Breaking down the massive DDoS attack that briefly disrupted one of the world's largest CDNs. Technical analysis of attack vectors, infrastructure weaknesses, and critical lessons for building resilient systems.</p>
+                        <a href="posts/cloudflare-outage-ddos-lessons-learned.html" class="read-more">Read Full Article →</a>
+                        <div class="blog-stats">
+                            <span class="blog-stat">⏱️ 12 min read</span>
+                            <span class="blog-stat">👁️ 5.2K views</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 5 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <span>🔒</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Best Practices</span>
+                            <span class="blog-date">📅 September 28, 2025</span>
+                        </div>
+                        <h3><a href="posts/ddos-mitigation-strategies-2025.html">DDoS Mitigation Strategies That Actually Work in 2025</a></h3>
+                        <p class="blog-excerpt">From rate limiting to traffic scrubbing, we test and evaluate modern DDoS mitigation techniques. Real performance data, cost analysis, and implementation guides for startups to enterprises.</p>
+                        <a href="posts/ddos-mitigation-strategies-2025.html" class="read-more">Read Full Article →</a>
+                        <div class="blog-stats">
+                            <span class="blog-stat">⏱️ 15 min read</span>
+                            <span class="blog-stat">👁️ 4.7K views</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 6 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <span>💰</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Industry News</span>
+                            <span class="blog-date">📅 September 24, 2025</span>
+                        </div>
+                        <h3><a href="posts/ddos-for-hire-market-analysis-2025.html">Inside the DDoS-for-Hire Market: 2025 Analysis</a></h3>
+                        <p class="blog-excerpt">DDoS-for-hire services (booters/stressers) are a $2B underground industry. We infiltrated several services to understand pricing, capabilities, and the disturbing ease of launching attacks. Plus: law enforcement takedown efforts.</p>
+                        <a href="posts/ddos-for-hire-market-analysis-2025.html" class="read-more">Read Full Article →</a>
+                        <div class="blog-stats">
+                            <span class="blog-stat">⏱️ 11 min read</span>
+                            <span class="blog-stat">👁️ 6.8K views</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" style="padding: 80px 0;">
+        <div class="container" style="text-align: center;">
+            <h2 class="section-title">About Our Blog</h2>
+            <p class="section-subtitle" style="max-width: 800px; margin: 0 auto;">
+                ShieldStack Blog is written by certified cybersecurity professionals (CISSP, CEH, OSCP) with over 10 years of hands-on experience defending against DDoS attacks and cyber threats. Our mission is to share practical knowledge, real-world insights, and honest opinions about cybersecurity challenges facing organizations today.
+            </p>
+            <div style="margin-top: 2rem;">
+                <a href="/#contact" class="btn btn-primary">Get Our Newsletter</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <svg width="30" height="30" viewBox="0 0 40 40" fill="none" aria-label="ShieldStack Logo">
+                        <path d="M20 2L4 10V18C4 27.5 10.5 36.1 20 38C29.5 36.1 36 27.5 36 18V10L20 2Z" stroke="#00d4ff" stroke-width="2" fill="rgba(0,212,255,0.1)"/>
+                    </svg>
+                    <span>ShieldStack</span>
+                </div>
+                <p>&copy; 2021-2025 ShieldStack LLC. All rights reserved. Professional cybersecurity services, software development, and secure cloud hosting.</p>
+                <div class="footer-links">
+                    <a href="/#services">Services</a>
+                    <a href="/#about">About</a>
+                    <a href="/blog">Blog</a>
+                    <a href="/#contact">Contact</a>
+                    <a href="/documents/SETUP_GUIDE.md">Documentation</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+How to Download and Embed Images into Excel
+=============================================
+
+I've created an automated script that will:
+1. Log into the ManageEngine web interface
+2. Download all 420 embedded images
+3. Create a new Excel file with images embedded
+
+REQUIREMENTS:
+-------------
+✓ Python 3 with requests, openpyxl, and Pillow (already installed)
+✓ ManageEngine login credentials
+✓ Access to https://helpdesk.appsforte.com/
+
+HOW TO RUN:
+-----------
+1. Open a terminal
+
+2. Run the script:
+   python3 /tmp/download_and_embed_images.py
+
+3. When prompted, enter your ManageEngine credentials:
+   - Username: (your helpdesk username)
+   - Password: (your helpdesk password)
+
+4. The script will:
+   - Test authentication
+   - Download all images (this may take 10-20 minutes for 420 images)
+   - Create Excel file with embedded images
+   - Save to: /home/appsforte/ManageEngine_KB_WITH_EMBEDDED_IMAGES.xlsx
+
+WHAT IT DOES:
+-------------
+- Downloads images from URLs like:
+  https://helpdesk.appsforte.com/api/v3/solutions/660/images/69773
+
+- Saves images locally to:
+  /home/appsforte/solution_images_downloaded/
+
+- Embeds the first image from each solution into Excel
+  (resized to fit: max 200x150 pixels)
+
+- Creates a comprehensive spreadsheet with:
+  * Solution ID
+  * Title
+  * Description (plain text, limited to 500 chars)
+  * Embedded image (actual picture in cell)
+  * Attachments list
+
+TROUBLESHOOTING:
+----------------
+If images don't download:
+1. Check that https://helpdesk.appsforte.com/ is accessible
+2. Verify your credentials are correct
+3. The API endpoint might require special authentication
+
+Alternative: Manual download
+If the automated script doesn't work, the ManageEngine web interface
+must be accessed manually through a web browser.
+
+NOTES:
+------
+- The script includes a 0.5 second delay between downloads to be polite
+- Images are resized to fit in Excel cells (max 200x150px)
+- Only the first image per solution is embedded (to keep file size manageable)
+- All images are saved locally for reference
+
+ESTIMATED TIME:
+---------------
+- 420 images × 0.5 seconds = ~3-4 minutes minimum
+- Plus download time depending on image sizes
+- Total: 10-20 minutes expected
+
+Run the script now to get your complete knowledge base with images!

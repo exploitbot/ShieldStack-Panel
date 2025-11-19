@@ -158,7 +158,7 @@ $recentTickets = $recentTicketsStmt->fetchAll();
                             </div>
                         <?php else: ?>
                             <p style="color: var(--text-secondary); text-align: center; padding: 20px;">
-                                No services yet. <a href="plans.php" style="color: var(--primary-color);">Browse our plans</a> to get started.
+                                No services yet. <a href="/panel/plans.php" style="color: var(--primary-color);">Browse our plans</a> to get started.
                             </p>
                         <?php endif; ?>
                     </div>

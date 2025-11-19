@@ -342,7 +342,7 @@ $services = $servicesStmt->fetchAll();
                             <p style="color: var(--text-secondary); margin-bottom: 20px;">
                                 You don't have any services yet. Browse our plans to get started!
                             </p>
-                            <a href="plans.php" class="btn btn-primary">Browse Plans</a>
+                            <a href="/panel/plans.php" class="btn btn-primary">Browse Plans</a>
                         </div>
                     </div>
                 <?php endif; ?>

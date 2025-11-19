@@ -1,0 +1,49 @@
+stgebsdb1 Reliability Plan – Preventing Future ASM Evictions
+============================================================
+
+1. Rebalance Scheduled Jobs
+   - Move ClamAV full scans (`clam-scan-daily`) and `mlocate-updatedb` off midnight/04:00 to staggered windows.
+   - Ensure antivirus monitors (`clam-scan-monitor`) do not overlap; reduce frequency from every 5 minutes while scans run.
+   - Coordinate with security/ops so only one resource-heavy job executes per hour on node1.
+
+2. Throttle Maintenance Workloads
+   - Wrap ClamAV jobs with `nice` and `ionice` (e.g., `ionice -c2 -n6 nice -n10 clamscan ...`) to cap CPU/disk impact.
+   - Limit scan scope to critical mount points or use incremental signatures to shorten runtime.
+
+3. Separate RMAN / Database Tasks
+   - Reschedule the 04:00 RMAN maintenance job to an off-peak time or move it to node2.
+   - Validate RMAN scripts for concurrency controls so they wait when ASM is under stress.
+
+4. Control System Timers
+   - Adjust `dnf-makecache.timer`, `mlocate-updatedb.timer`, and other systemd timers so they trigger during low activity.
+   - Disable redundant timers on node1 if node2 already handles repository cache refreshes.
+
+5. Fix SSSD Stability
+   - Review `/etc/sssd/sssd.conf` for unreachable domains; disable unused providers.
+   - Increase `ldap_opt_timeout` / `krb5_auth_timeout` and ensure backends respond quickly.
+   - Restart SSSD after configuration changes and monitor `journalctl -u sssd*` for watchdog alerts.
+
+6. Address Postfix Errors
+   - Repair the `public/pickup` queue (e.g., ensure `postfix` is fully installed and `postfix start` succeeds) so cron
+     jobs sending mail do not hang on IPC errors.
+
+7. Enhance CSS Fault Tolerance (after load tuning)
+   - Once system load is under control, consider `crsctl set css diagwait 45` (or per Oracle best practices) to give CSS
+     more time before fencing. Do NOT extend diagwait until maintenance bursts are fixed to avoid masking real hangs.
+
+8. Capture Performance Evidence
+   - Enable OSWatcher/CHM or a custom `sar/vmstat/iostat` script covering the known windows (00:00, 04:00, 15:00).
+   - Use the data to verify that CPU, run queue, and disk throughput remain within safe limits after changes.
+
+9. Monitor Proactively
+   - Add alerting for CRS-5818/5014, listener `service_died`, and SSSD watchdog messages so the team can react before
+     CSS fences the node.
+   - Set up Grafana/Prometheus or OEM metrics for system load, I/O wait, and ASM heartbeat latency.
+
+10. Communicate Freeze Windows
+   - Notify application owners of maintenance freezes around database clusters so unexpected jobs (security scans,
+     patching) are not launched during critical hours.
+   - Document the new schedule and publish it in the change calendar; review quarterly.
+
+Following these steps prevents the deterministic CPU/disk starvation that caused CSS to fence node1, ensuring +ASM1 and
+its databases remain stable.

@@ -10,7 +10,7 @@
     <nav class="sidebar-nav">
         <div class="nav-section">
             <div class="nav-section-title">Main</div>
-            <a href="dashboard.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
+            <a href="/panel/dashboard.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">📊</span>
                 <span>Dashboard</span>
             </a>
@@ -26,15 +26,15 @@
 
         <div class="nav-section">
             <div class="nav-section-title">Hosting</div>
-            <a href="services.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'services.php' ? 'active' : ''; ?>">
+            <a href="/panel/services.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'services.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">🖥️</span>
                 <span>My Services</span>
             </a>
-            <a href="plans.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'plans.php' ? 'active' : ''; ?>">
+            <a href="/panel/plans.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'plans.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">📦</span>
                 <span>Browse Plans</span>
             </a>
-            <a href="domains.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'domains.php' ? 'active' : ''; ?>">
+            <a href="/panel/domains.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'domains.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">🌐</span>
                 <span>Domains</span>
             </a>
@@ -42,7 +42,7 @@
 
         <div class="nav-section">
             <div class="nav-section-title">Billing</div>
-            <a href="invoices.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'invoices.php' ? 'active' : ''; ?>">
+            <a href="/panel/invoices.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'invoices.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">💳</span>
                 <span>Invoices</span>
             </a>
@@ -50,11 +50,11 @@
 
         <div class="nav-section">
             <div class="nav-section-title">Support</div>
-            <a href="tickets.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'tickets.php' ? 'active' : ''; ?>">
+            <a href="/panel/tickets.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'tickets.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">🎫</span>
                 <span>Support Tickets</span>
             </a>
-            <a href="knowledgebase.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'knowledgebase.php' ? 'active' : ''; ?>">
+            <a href="/panel/knowledgebase.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'knowledgebase.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">📚</span>
                 <span>Knowledge Base</span>
             </a>
@@ -62,7 +62,7 @@
 
         <div class="nav-section">
             <div class="nav-section-title">Account</div>
-            <a href="profile.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : ''; ?>">
+            <a href="/panel/profile.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">👤</span>
                 <span>My Profile</span>
             </a>

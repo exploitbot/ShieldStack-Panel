@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slack AI Agent Bot - Technical Details</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .card { background: white; padding: 30px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #667eea; }
+        h2 { color: #764ba2; margin-top: 25px; }
+        h3 { color: #555; margin-top: 15px; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; color: #e83e8c; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        pre code { background: none; color: inherit; }
+        .info { background: #d1ecf1; border-left: 4px solid #0c5460; padding: 15px; margin: 15px 0; }
+        ol, ul { margin-left: 20px; margin-top: 10px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔧 Technical Architecture Details</h1>
+        <p><a href="index.html">← Back to Main Page</a></p>
+
+        <h2>System Architecture</h2>
+
+        <h3>Component Stack</h3>
+        <ol>
+            <li><strong>slack_bot.py</strong> - Slack integration layer
+                <ul>
+                    <li>Handles Socket Mode WebSocket connection</li>
+                    <li>Event handlers for app_mention, DMs, slash commands</li>
+                    <li>Creates background threads for agent communication</li>
+                    <li>Updates Slack messages every 2 seconds with progress</li>
+                    <li>Filters ANSI codes and Claude UI elements</li>
+                </ul>
+            </li>
+
+            <li><strong>agent_manager.py</strong> - Process lifecycle manager
+                <ul>
+                    <li>Manages wrapper process via PTY (pseudo-terminal)</li>
+                    <li>Separate thread for continuous output monitoring</li>
+                    <li>Thread-safe buffer with locks</li>
+                    <li>Detects <code>---RESPONSE-COMPLETE---</code> marker</li>
+                    <li>120-second timeout handling</li>
+                </ul>
+            </li>
+
+            <li><strong>claude_persistent_wrapper.py</strong> - Critical bridge
+                <ul>
+                    <li>Reads user messages from stdin (line-by-line)</li>
+                    <li>Calls: <code>claude --print --dangerously-skip-permissions</code></li>
+                    <li>Uses <code>--continue</code> flag after first message</li>
+                    <li>Outputs response to stdout</li>
+                    <li>Prints <code>---RESPONSE-COMPLETE---</code> when done</li>
+                    <li>Maintains Claude context across messages</li>
+                </ul>
+            </li>
+
+            <li><strong>Claude Code CLI</strong> - AI engine
+                <ul>
+                    <li>Binary: <code>/home/appsforte/.nvm/versions/node/v24.10.0/bin/claude</code></li>
+                    <li>Model: Sonnet 4.5 (Claude Max)</li>
+                    <li>Full tool access (Bash, Read, Write, Grep, WebSearch, etc.)</li>
+                    <li>Processes requests and returns responses</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h2>Message Flow (Detailed)</h2>
+
+        <div class="info">
+            <h3 style="margin-top: 0;">Step-by-Step Execution</h3>
+        </div>
+
+        <ol>
+            <li><strong>Slack Message Reception</strong> (slack_bot.py:197-218)
+                <pre><code>• User sends "What is 2+2?" in Slack
+• Socket Mode WebSocket receives event
+• Bot mention stripped if needed
+• Initial message posted: "🤔 Processing your request..."
+• Message timestamp captured for updates</code></pre>
+            </li>
+
+            <li><strong>Background Thread Creation</strong> (slack_bot.py:235-247)
+                <pre><code>• New thread spawned (prevents blocking main loop)
+• Response container created: {"response": None, "done": False}
+• Thread calls agent_manager.send_input()</code></pre>
+            </li>
+
+            <li><strong>Agent Manager Processing</strong> (agent_manager.py:114-173)
+                <pre><code>• Buffer cleared: output_buffer.clear()
+• Input sent to wrapper via PTY:
+  os.write(master_fd, "What is 2+2?\n")
+• Waits for ---RESPONSE-COMPLETE--- marker (up to 120s)
+• Monitor thread reads wrapper output into buffer</code></pre>
+            </li>
+
+            <li><strong>Wrapper Execution</strong> (claude_persistent_wrapper.py:17-60)
+                <pre><code>• Reads from stdin: line = sys.stdin.readline()
+• Builds command:
+  ["claude", "--print", "--dangerously-skip-permissions", "--continue", "What is 2+2?"]
+• Runs: subprocess.run(cmd, capture_output=True, timeout=120)
+• Outputs stdout to PTY
+• Prints "---RESPONSE-COMPLETE---"</code></pre>
+            </li>
+
+            <li><strong>Claude Code Execution</strong>
+                <pre><code>• Receives request with full permissions
+• Processes: "What is 2+2?"
+• Uses tools if needed (in this case, just calculation)
+• Returns: "2 + 2 = 4"</code></pre>
+            </li>
+
+            <li><strong>Live Progress Updates</strong> (slack_bot.py:253-291)
+                <pre><code>• Update loop runs every 2 seconds
+• Reads output_buffer (with lock)
+• Applies clean_claude_output() filter
+• Updates Slack message:
+  "_Claude is thinking..._\n\n2 + 2 = 4\n\n_⏳ Processing..._"</code></pre>
+            </li>
+
+            <li><strong>Output Cleaning</strong> (slack_bot.py:31-109)
+                <pre><code>• strip_ansi_codes() removes: \x1B[0m, [2K, etc.
+• clean_claude_output() removes:
+  - "Claude Code wrapper started..."
+  - "---RESPONSE-COMPLETE---"
+  - Box drawing characters (│╰╯╭╮─)
+  - UI prompts ("⏵⏵ bypass permissions", etc.)
+  - Version info, separators</code></pre>
+            </li>
+
+            <li><strong>Response Completion</strong> (slack_bot.py:292-333)
+                <pre><code>• Marker detected: "---RESPONSE-COMPLETE---"
+• Background thread sets: response_container["done"] = True
+• Update loop exits
+• Final Slack message update: "2 + 2 = 4"
+• No more "thinking" indicator</code></pre>
+            </li>
+
+            <li><strong>Context Preservation</strong>
+                <pre><code>• Wrapper stays running
+• use_continue = True set after first message
+• Next message uses --continue flag
+• Claude remembers: "What about 3 times that?" → "12"</code></pre>
+            </li>
+        </ol>
+
+        <h2>Threading Model</h2>
+        <ul>
+            <li><strong>Main Thread:</strong> Handles Slack events via Socket Mode</li>
+            <li><strong>Background Thread (per request):</strong> Calls agent_manager.send_input(), waits for response</li>
+            <li><strong>Monitor Thread (persistent):</strong> Continuously reads wrapper PTY output</li>
+            <li><strong>Update Loop (per request):</strong> Polls buffer every 2s, updates Slack message</li>
+        </ul>
+
+        <h2>Configuration Files</h2>
+
+        <h3>.env Configuration</h3>
+        <pre><code>SLACK_BOT_TOKEN=xoxb-YOUR-BOT-TOKEN-HERE
+SLACK_APP_TOKEN=xapp-1-YOUR-APP-TOKEN-HERE
+AGENT_COMMAND=python3 /home/appsforte/slackaiagent/claude_persistent_wrapper.py
+AGENT_RESPONSE_TIMEOUT=120</code></pre>
+
+        <h3>SystemD Service</h3>
+        <pre><code>[Unit]
+Description=Slack AI Agent Bot
+After=network.target
+
+[Service]
+Type=simple
+User=appsforte
+WorkingDirectory=/home/appsforte/slackaiagent
+ExecStart=/usr/bin/python3 /home/appsforte/slackaiagent/main.py
+Restart=always
+RestartSec=10
+Environment="PYTHONUNBUFFERED=1"
+Environment="HOME=/home/appsforte"
+Environment="PATH=/home/appsforte/.nvm/versions/node/v24.10.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+
+        <h2>Key Technical Decisions</h2>
+
+        <h3>Why PTY Instead of Direct Pipes?</h3>
+        <p>Pseudo-terminal provides proper interactive communication. Standard pipes would buffer differently and lose real-time capability.</p>
+
+        <h3>Why Wrapper Instead of Direct Claude Call?</h3>
+        <p>Claude Code's interactive mode doesn't auto-process stdin. The wrapper uses <code>--print</code> for one-shot execution while maintaining context via <code>--continue</code>.</p>
+
+        <h3>Why Marker System?</h3>
+        <p>Time-based completion detection is unreliable. <code>---RESPONSE-COMPLETE---</code> marker guarantees we have full response.</p>
+
+        <h3>Why 2-Second Updates?</h3>
+        <p>Balance between real-time feel and API rate limits. Too frequent causes API errors, too slow feels unresponsive.</p>
+
+        <h3>Why Thread-Safe Buffer?</h3>
+        <p>Monitor thread writes to buffer, update loop reads from it. Without locks, race conditions cause missing/duplicate output.</p>
+
+        <p style="margin-top: 30px;"><a href="index.html">← Back to Main Page</a></p>
+    </div>
+</body>
+</html>

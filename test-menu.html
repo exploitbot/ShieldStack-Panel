@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <span>Test Menu</span>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#test1">Test 1</a></li>
+                <li><a href="#test2">Test 2</a></li>
+                <li><a href="#test3">Test 3</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div style="padding: 50px;">
+        <h1>Menu Test Page</h1>
+        <p>Click the hamburger menu (☰) button in the top right on mobile.</p>
+        <p>Open your browser console (F12) to see debug messages.</p>
+        <button onclick="window.toggleMobileMenu()" style="padding: 10px 20px; font-size: 16px; margin-top: 20px;">
+            Manual Toggle (for testing)
+        </button>
+    </div>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    <script src="script.js"></script>
+</body>
+</html>

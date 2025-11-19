@@ -22,7 +22,7 @@
                 <span class="nav-icon">🖥️</span>
                 <span>My Services</span>
             </a>
-            <a href="plans.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'plans.php' ? 'active' : ''; ?>">
+            <a href="/panel/plans.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'plans.php' ? 'active' : ''; ?>">
                 <span class="nav-icon">📦</span>
                 <span>Browse Plans</span>
             </a>

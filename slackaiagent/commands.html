@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commands Reference - Slack AI Agent Bot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ Commands Reference</h1>
+            <p>40+ command shortcuts for system administration</p>
+        </header>
+
+        <nav class="breadcrumb">
+            <a href="index.html">← Back to Home</a>
+        </nav>
+
+        <div class="info-box">
+            <h3>💡 How Commands Work</h3>
+            <p>Commands are <strong>optional shortcuts</strong>. You can always use natural language instead!</p>
+            <p><strong>Example:</strong> <code>disk /var</code> is the same as "Check disk usage for /var"</p>
+        </div>
+
+        <div class="card">
+            <h2>🗂️ File Operations</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Example</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>read &lt;path&gt;</code></td>
+                    <td><code>read /etc/hosts</code></td>
+                    <td>Read and display file contents</td>
+                </tr>
+                <tr>
+                    <td><code>edit &lt;path&gt;</code></td>
+                    <td><code>edit /etc/nginx/nginx.conf</code></td>
+                    <td>Edit file contents</td>
+                </tr>
+                <tr>
+                    <td><code>write &lt;path&gt;</code></td>
+                    <td><code>write /tmp/notes.txt</code></td>
+                    <td>Create or write to file</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🔍 Search & Discovery</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Example</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>find &lt;pattern&gt;</code></td>
+                    <td><code>find *.py</code></td>
+                    <td>Find files matching pattern</td>
+                </tr>
+                <tr>
+                    <td><code>search "text" in &lt;path&gt;</code></td>
+                    <td><code>search "error" in /var/log</code></td>
+                    <td>Search for text in files</td>
+                </tr>
+                <tr>
+                    <td><code>grep &lt;pattern&gt;</code></td>
+                    <td><code>grep "TODO"</code></td>
+                    <td>Search codebase</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>⚡ System Commands</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Example</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>run &lt;command&gt;</code></td>
+                    <td><code>run systemctl status nginx</code></td>
+                    <td>Execute bash command</td>
+                </tr>
+                <tr>
+                    <td><code>bash &lt;command&gt;</code></td>
+                    <td><code>bash df -h</code></td>
+                    <td>Run bash command</td>
+                </tr>
+                <tr>
+                    <td><code>ls [path]</code></td>
+                    <td><code>ls /var/www</code></td>
+                    <td>List directory contents</td>
+                </tr>
+                <tr>
+                    <td><code>cd &lt;path&gt;</code></td>
+                    <td><code>cd /home/user</code></td>
+                    <td>Change directory</td>
+                </tr>
+                <tr>
+                    <td><code>pwd</code></td>
+                    <td><code>pwd</code></td>
+                    <td>Show current directory</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🚀 Quick Shortcuts</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Example</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>disk [path]</code></td>
+                    <td><code>disk /var</code></td>
+                    <td>Check disk usage</td>
+                </tr>
+                <tr>
+                    <td><code>mem</code></td>
+                    <td><code>mem</code></td>
+                    <td>Show memory usage</td>
+                </tr>
+                <tr>
+                    <td><code>top</code></td>
+                    <td><code>top</code></td>
+                    <td>Show top processes</td>
+                </tr>
+                <tr>
+                    <td><code>logs &lt;service&gt;</code></td>
+                    <td><code>logs nginx</code></td>
+                    <td>View service logs</td>
+                </tr>
+                <tr>
+                    <td><code>status &lt;service&gt;</code></td>
+                    <td><code>status postgresql</code></td>
+                    <td>Check service status</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🖥️ Screen Bridge Commands</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Example</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>pull [N]</code></td>
+                    <td><code>pull 120</code></td>
+                    <td>Tail the agent log (default 80 lines; max 400)</td>
+                </tr>
+                <tr>
+                    <td><code>show [N]</code></td>
+                    <td><code>show 50</code></td>
+                    <td>Alias of pull with a 50-line default</td>
+                </tr>
+                <tr>
+                    <td><code>command &lt;text&gt;</code></td>
+                    <td><code>command help</code></td>
+                    <td>Sends agent slash commands (prepends “/” automatically)</td>
+                </tr>
+                <tr>
+                    <td><code>status</code></td>
+                    <td><code>status</code></td>
+                    <td>Check if the screen session/log exist</td>
+                </tr>
+                <tr>
+                    <td><code>logpath on/off</code></td>
+                    <td><code>logpath on</code></td>
+                    <td>Reveal or hide the log directory in Slack responses</td>
+                </tr>
+                <tr>
+                    <td><code>help</code></td>
+                    <td><code>help</code></td>
+                    <td>Show the screen bridge cheat sheet</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🌐 Remote Operations</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Example</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>ssh &lt;command&gt;</code></td>
+                    <td><code>ssh root@10.100.90.6 "df -h"</code></td>
+                    <td>SSH and execute command</td>
+                </tr>
+                <tr>
+                    <td><code>deploy &lt;target&gt;</code></td>
+                    <td><code>deploy my-app</code></td>
+                    <td>Deploy application</td>
+                </tr>
+                <tr>
+                    <td><code>backup &lt;path&gt;</code></td>
+                    <td><code>backup /var/www</code></td>
+                    <td>Create backup</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🤖 Bot Management</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>/agent status</code></td>
+                    <td>Check if bot is running</td>
+                </tr>
+                <tr>
+                    <td><code>/agent stop</code></td>
+                    <td>Stop current operation (Ctrl+C)</td>
+                </tr>
+                <tr>
+                    <td><code>/agent restart</code></td>
+                    <td>Restart the bot</td>
+                </tr>
+                <tr>
+                    <td><code>/agent clear</code></td>
+                    <td>Clear conversation context</td>
+                </tr>
+                <tr>
+                    <td><code>/agent newsession</code></td>
+                    <td>Generate new session ID</td>
+                </tr>
+                <tr>
+                    <td><code>/agent help</code></td>
+                    <td>Show all commands</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="warning-box">
+            <h3>📝 Tips</h3>
+            <ul>
+                <li><strong>Natural language always works</strong> - Commands are just shortcuts</li>
+                <li><strong>Mix both</strong> - "disk /var and explain what's using space"</li>
+                <li><strong>Case insensitive</strong> - "DISK /var" works too</li>
+                <li><strong>Bot remembers context</strong> - You can refer to previous responses</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p><a href="index.html">← Back to Home</a> | <a href="quick-start.html">Quick Start →</a></p>
+            <p style="margin-top: 10px;">For detailed examples, see: <code>/var/www/html/slackaiagent/COMMAND_REFERENCE.md</code></p>
+        </div>
+    </div>
+</body>
+</html>

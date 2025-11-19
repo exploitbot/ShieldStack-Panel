@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>YT Saver - Download YouTube Videos</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-download"></i>
+                <span>YT Saver</span>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-right" id="navRight">
+                <div id="userSection" class="user-section hidden">
+                    <div class="user-profile">
+                        <img id="userAvatar" src="" alt="User" class="user-avatar">
+                        <span id="userName" class="user-name"></span>
+                    </div>
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
+                </div>
+                <button id="loginBtn" class="btn-login hidden">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign in</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header-section">
+            <h1>Download YouTube Videos</h1>
+            <p>Fast, easy, and completely free</p>
+        </header>
+
+        <!-- Main Form -->
+        <main class="main-content">
+            <!-- URL Input Section -->
+            <div class="card input-card">
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="urlInput" 
+                            placeholder="Paste YouTube link..." 
+                            class="url-input"
+                        >
+                        <button id="fetchBtn" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            <span class="btn-text">Get Info</span>
+                        </button>
+                    </div>
+                    <p class="helper-text">
+                        Videos • Shorts • Playlists
+                    </p>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingSpinner" class="card loading-card hidden">
+                <div class="spinner"></div>
+                <p>Fetching video...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="card error-card hidden">
+                <div class="error-header">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Something went wrong</span>
+                </div>
+                <p id="errorText" class="error-text"></p>
+                <button id="authPrompt" class="btn btn-secondary btn-auth hidden">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign in with Google
+                </button>
+            </div>
+
+            <!-- Video Info Section -->
+            <div id="videoInfo" class="card video-card hidden">
+                <div class="video-preview">
+                    <img id="thumbnail" src="" alt="Video thumbnail" class="thumbnail">
+                    <div class="video-details">
+                        <h2 id="videoTitle"></h2>
+                        <p id="uploader" class="uploader"></p>
+                        <div class="video-meta">
+                            <span id="duration" class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span></span>
+                            </span>
+                            <span id="type" class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quality-section">
+                    <h3>Quality</h3>
+                    <div id="qualityOptions" class="quality-options">
+                    </div>
+                </div>
+
+                <div class="download-section">
+                    <button id="downloadBtn" class="btn btn-success btn-large">
+                        <i class="fas fa-download"></i>
+                        Download
+                    </button>
+                    <p id="downloadStatus" class="status-message hidden"></p>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section" id="featuresSection">
+                <h3>Why YT Saver?</h3>
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Fast</h4>
+                        <p>Seconds, not minutes</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-video"></i>
+                        <h4>All Types</h4>
+                        <p>Videos & Shorts</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-image"></i>
+                        <h4>4K Quality</h4>
+                        <p>Up to 4K resolution</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-lock"></i>
+                        <h4>Secure</h4>
+                        <p>100% private</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>YT Saver • No ads • No tracking • Free forever</p>
+        </footer>
+    </div>
+
+    <script src="static/js/script.js"></script>
+</body>
+</html>

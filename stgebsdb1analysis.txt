@@ -1,0 +1,63 @@
+stgebsdb1 / stgebsdb2 – Eviction Investigation (Updated 2025-11-11 16:55 PST)
+=============================================================
+
+1. Incident Timeline Summary
+   - 2025-11-09 00:06 PST: +ASM1 eviction (ORA-481) – alert_+ASM1.log:12935
+   - 2025-11-09 04:15 PST: +ASM1 eviction – alert_+ASM1.log:13413
+   - 2025-11-10 00:04 PST: +ASM1 eviction – alert_+ASM1.log:13902
+   - 2025-11-10 04:06 PST: +ASM1 eviction – alert_+ASM1.log:14383
+   - 2025-11-11 00:06 PST: +ASM1 eviction – alert_+ASM1.log:14897
+   - 2025-11-11 04:04 PST: +ASM1 eviction – alert_+ASM1.log:15372
+   - 2025-11-11 15:25 PST: +ASM1 eviction – alert_+ASM1.log:15845
+   Every entry reads “Received an instance abort message from instance 2,” proving node2 fenced node1 each time.
+
+2. Listener & Client Impact
+   - Listener alert file (`/u01/app/orastg/diag/tnslsnr/stgebsdb1/listener/alert/log.xml`) logs matching
+     `service_died * +ASM1 * 12537/12547` events at every timestamp plus TNS-12525 timeout at 04:04 on 11/11.
+   - Sample references: lines 3564808 (09-Nov 00:06), 3650887 (10-Nov 00:06), 3766261-3766275 (11-Nov 04:03/04),
+     3812763 (11-Nov 15:25).
+
+3. CRS / Clusterware Evidence on Node1
+   - CRS alert (`/u01/app/orastg/diag/crs/stgebsdb1/crs/trace/alert.log`) shows waves of CRS-5818/5014 “agent timed out
+     starting process” for `ora.drivers.acfs`, `ora.ons`, `ora.asm`, `ora.qosmserver`, etc., right before every fence.
+     Example: lines 4591-4655 cover 11-Nov events and show Clusterware hung before CSS evicted the node.
+
+4. Node2 Confirmation
+   - CSS trace on node2 (`/u01/app/orastg/diag/crs/stgebsdb2/crs/trace/ocssd.trc` lines 339764-340225) records
+     `clssgmpcFenceReq` and `clssgmFenceMember` calls around 15:25 on 11-Nov, verifying the peer actively fenced node1
+     after missed heartbeats.
+
+5. OS / Scheduler Correlation
+   - Node1 crontab runs heavy jobs simultaneously:
+       * Midnight: `mlocate-updatedb`, `freshclam`, `clam-scan-daily`, and two `clam-scan-monitor` invocations.
+       * 04:00: same ClamAV jobs plus `run-parts /etc/cron.hourly` (0anacron) and ORASTG RMAN maintenance.
+       * 15:21 on 11-Nov: `dnf-makecache.timer` downloads yum metadata.
+   - `journalctl` around each window confirms these processes start together and immediately precede SSSD failures.
+
+6. SSSD / Service Failures
+   - Repeated watchdog terminations for SSSD children around every crash window:
+       * 11-Nov 00:05 (`Child ... terminated by own WATCHDOG`).
+       * 11-Nov 04:02 (`sssd-kcm.service start-pre operation timed out`).
+       * 11-Nov 15:24 (`sssd` NSS/BE restarts while CRS agents already timing out).
+   - These failures explain lost CSS heartbeats: NSS lookups stall so CRS agents cannot respond.
+
+7. Resource Utilization (sar from /var/log/sa/sa11)
+   - 00:10 sample: 71% system CPU, 8.6% iowait, ~800k blocks/s throughput.
+   - 04:10 sample: 53% system CPU, 8.5% iowait, ~553k blocks/s throughput.
+   - 15:30 sample: 46% system CPU, 7% iowait, ~468k blocks/s throughput; run queue spikes to 33 at 15:30.
+   - These match CRS agent timeouts and SSSD failures, pointing to local resource starvation.
+
+8. Root Cause
+   - Concurrent maintenance (ClamAV scans, mlocate, cron.hourly/anacron, RMAN, dnf makecache) saturates CPU and disk,
+     starving SSSD, postfix, and CRS agents. When CSS heartbeats from node1 pause, node2 fences it, causing +ASM1 and
+     database downtime. No evidence of interconnect or storage failure—it is deterministic OS load exhaustion.
+
+9. Recommended Actions
+   1) Reschedule or throttle midnight/04:00 maintenance jobs: stagger ClamAV scans, mlocate, cron.hourly, and RMAN so
+      they no longer overlap; consider `nice` + `ionice` or moving scans to node2/off hours.
+   2) Stabilize SSSD/postfix so watchdog restarts do not block NSS lookups; only consider increasing CSS diagwait after
+      the load is addressed.
+   3) Capture OSWatcher or continuous `sar/vmstat/iostat` plus CSS tracing across the affected windows to validate the
+      fix and provide evidence to security/ops teams running the scans.
+   4) Communicate the deterministic outage windows (00:06, 04:04 daily; 15:25 when dnf overlaps) so user-facing teams
+      can expect impact until jobs are rebalanced.

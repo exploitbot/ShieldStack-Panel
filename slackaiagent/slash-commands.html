@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slash Commands Setup - Slack AI Agent Bot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⌨️ Slash Commands Setup</h1>
+            <p>Register /agent command in Slack</p>
+        </header>
+
+        <nav class="breadcrumb">
+            <a href="index.html">← Back to Home</a>
+        </nav>
+
+        <div class="warning-box">
+            <h3>⚠️ Why This Page?</h3>
+            <p>If you see an error when typing <code>/agent</code> in Slack, it's because the slash command isn't registered yet.</p>
+            <p><strong>This is optional!</strong> You can use regular messages instead (see workaround below).</p>
+        </div>
+
+        <div class="card">
+            <h2>📝 Register /agent Slash Command</h2>
+            
+            <div class="step">
+                <h3>Step 1: Go to Slack App Settings</h3>
+                <ol>
+                    <li>Visit <a href="https://api.slack.com/apps" target="_blank">https://api.slack.com/apps</a></li>
+                    <li>Select your app: <strong>EricAIAgents</strong> (App ID: A09SW99R5MX)</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h3>Step 2: Create Slash Command</h3>
+                <ol>
+                    <li>In left sidebar, click <strong>Slash Commands</strong></li>
+                    <li>Click <strong>Create New Command</strong></li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h3>Step 3: Configure the Command</h3>
+                <p>Fill in these details:</p>
+                
+                <table>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Command</strong></td>
+                        <td><code>/agent</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Request URL</strong></td>
+                        <td><code>https://example.com/slack/commands</code><br>
+                        <small>(Not used in Socket Mode, but required by Slack)</small></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Short Description</strong></td>
+                        <td>Control and manage the AI agent bot</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Usage Hint</strong></td>
+                        <td>[status|restart|stop|clear|newsession|help]</td>
+                    </tr>
+                </table>
+                
+                <p style="margin-top: 15px;">Click <strong>Save</strong></p>
+            </div>
+
+            <div class="step">
+                <h3>Step 4: Reinstall App (if prompted)</h3>
+                <ol>
+                    <li>Go to <strong>Install App</strong> in left sidebar</li>
+                    <li>If you see "Reinstall" button, click it</li>
+                    <li>Authorize the permissions</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>✅ Verification</h2>
+            <p>Test the slash command in Slack:</p>
+            <pre><code>/agent status</code></pre>
+            <p><strong>Expected response:</strong> <code>Agent status: *running*</code></p>
+        </div>
+
+        <div class="card">
+            <h2>🤖 Available /agent Commands</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>/agent status</code></td>
+                    <td>Check if bot is running</td>
+                </tr>
+                <tr>
+                    <td><code>/agent stop</code></td>
+                    <td><strong>NEW!</strong> Stop current operation (Ctrl+C)</td>
+                </tr>
+                <tr>
+                    <td><code>/agent restart</code></td>
+                    <td>Restart the agent process</td>
+                </tr>
+                <tr>
+                    <td><code>/agent clear</code></td>
+                    <td>Clear conversation context</td>
+                </tr>
+                <tr>
+                    <td><code>/agent newsession</code></td>
+                    <td>Generate new session ID and restart</td>
+                </tr>
+                <tr>
+                    <td><code>/agent help</code></td>
+                    <td>Show all available commands</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="info-box">
+            <h3>💡 Workaround: Use Regular Messages</h3>
+            <p>Can't register slash commands? No problem! Use regular messages instead:</p>
+            <table style="margin-top: 15px;">
+                <tr>
+                    <th>Instead of...</th>
+                    <th>Type...</th>
+                </tr>
+                <tr>
+                    <td><code>/agent help</code></td>
+                    <td><code>agent help</code></td>
+                </tr>
+                <tr>
+                    <td><code>/agent status</code></td>
+                    <td><code>agent status</code></td>
+                </tr>
+                <tr>
+                    <td><code>/agent stop</code></td>
+                    <td><code>agent stop</code></td>
+                </tr>
+            </table>
+            <p><strong>The bot understands both!</strong></p>
+        </div>
+
+        <div class="footer">
+            <p><a href="index.html">← Back to Home</a> | <a href="troubleshooting.html">Troubleshooting →</a></p>
+        </div>
+    </div>
+</body>
+</html>

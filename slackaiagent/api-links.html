@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Links - Slack AI Agent Bot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔗 API & Links</h1>
+            <p>Quick access to Slack app settings</p>
+        </header>
+
+        <nav class="breadcrumb">
+            <a href="index.html">← Back to Home</a>
+        </nav>
+
+        <div class="info-box">
+            <h3>📱 Your Slack App</h3>
+            <p><strong>App Name:</strong> EricAIAgents</p>
+            <p><strong>App ID:</strong> A09SW99R5MX</p>
+        </div>
+
+        <div class="card">
+            <h2>🔑 Token Management</h2>
+            <table>
+                <tr>
+                    <th>What</th>
+                    <th>Link</th>
+                    <th>Look For</th>
+                </tr>
+                <tr>
+                    <td><strong>Bot User OAuth Token</strong><br>(xoxb-...)</td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/oauth" target="_blank" class="button">OAuth & Permissions →</a></td>
+                    <td>Copy token starting with <code>xoxb-</code></td>
+                </tr>
+                <tr>
+                    <td><strong>App-Level Token</strong><br>(xapp-...)</td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/socket-mode" target="_blank" class="button">Socket Mode →</a></td>
+                    <td>Copy token starting with <code>xapp-</code></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>⚙️ App Configuration</h2>
+            <table>
+                <tr>
+                    <th>Page</th>
+                    <th>Link</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><strong>App Home</strong></td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/app-home" target="_blank" class="button">Configure →</a></td>
+                    <td>Enable Messages Tab</td>
+                </tr>
+                <tr>
+                    <td><strong>Event Subscriptions</strong></td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/event-subscriptions" target="_blank" class="button">Configure →</a></td>
+                    <td>Subscribe to bot events</td>
+                </tr>
+                <tr>
+                    <td><strong>Slash Commands</strong></td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/slash-commands" target="_blank" class="button">Configure →</a></td>
+                    <td>Register /agent command</td>
+                </tr>
+                <tr>
+                    <td><strong>Install App</strong></td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/install-on-team" target="_blank" class="button">Install →</a></td>
+                    <td>Install or reinstall to workspace</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>📖 Slack API Documentation</h2>
+            <ul>
+                <li><a href="https://api.slack.com/" target="_blank">Slack API Home</a></li>
+                <li><a href="https://api.slack.com/apis/connections/socket" target="_blank">Socket Mode Documentation</a></li>
+                <li><a href="https://api.slack.com/authentication/token-types" target="_blank">Token Types Explained</a></li>
+                <li><a href="https://api.slack.com/methods" target="_blank">API Methods Reference</a></li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🔧 Server Management</h2>
+            <table>
+                <tr>
+                    <th>Action</th>
+                    <th>Command</th>
+                </tr>
+                <tr>
+                    <td>Check Status</td>
+                    <td><code>sudo systemctl status slack-claude-bot</code></td>
+                </tr>
+                <tr>
+                    <td>View Logs</td>
+                    <td><code>sudo journalctl -u slack-claude-bot -f</code></td>
+                </tr>
+                <tr>
+                    <td>Restart Service</td>
+                    <td><code>sudo systemctl restart slack-claude-bot</code></td>
+                </tr>
+                <tr>
+                    <td>Edit Config</td>
+                    <td><code>sudo nano /home/appsforte/slackaiagent/.env</code></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="warning-box">
+            <h3>⚠️ Important</h3>
+            <ul>
+                <li>Never share your tokens publicly</li>
+                <li>BOT_TOKEN must start with <code>xoxb-</code></li>
+                <li>APP_TOKEN must start with <code>xapp-</code></li>
+                <li>After changing tokens, restart the service</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p><a href="index.html">← Back to Home</a></p>
+        </div>
+    </div>
+</body>
+</html>

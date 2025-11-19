@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start - Slack AI Agent Bot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Quick Start</h1>
+            <p>How to use the screen-bridge workflow in seconds</p>
+        </header>
+
+        <nav class="breadcrumb">
+            <a href="index.html">← Back to Home</a>
+        </nav>
+
+        <div class="card">
+            <h2>3-Step Test (every conversation works like this)</h2>
+            <ol class="step-list">
+                <li><strong>Send a message:</strong> “What is 2+2?”</li>
+                <li><strong>Wait ~2 seconds.</strong></li>
+                <li><strong>Type <code>pull 80</code> or <code>show 50</code></strong> to read the agent’s reply (pick a larger number for long answers).</li>
+            </ol>
+            <p>Need more output? Re-run <code>pull 200</code> / <code>show 200</code> until the answer finishes.</p>
+        </div>
+
+        <div class="card">
+            <h2>Essential Commands</h2>
+            <table>
+                <tr>
+                    <th>Message</th>
+                    <th>What it does</th>
+                </tr>
+                <tr>
+                    <td><code>pull [N]</code></td>
+                    <td>Tail the agent log (default 80 lines; max 400)</td>
+                </tr>
+                <tr>
+                    <td><code>show [N]</code></td>
+                    <td>Alias of pull that defaults to 50 lines</td>
+                </tr>
+                <tr>
+                    <td><code>status</code></td>
+                    <td>Check if the screen session/log exist</td>
+                </tr>
+                <tr>
+                    <td><code>command help</code></td>
+                    <td>Runs <code>/help</code> inside the agent session (any text works)</td>
+                </tr>
+                <tr>
+                    <td><code>logpath on/off</code></td>
+                    <td>Reveal or hide the log directory in bridge replies</td>
+                </tr>
+                <tr>
+                    <td><code>help</code></td>
+                    <td>Show this workflow directly in Slack</td>
+                </tr>
+            </table>
+
+            <h3 style="margin-top: 25px;">Slash Commands</h3>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>/agent status</code></td>
+                    <td>Is the bridge process running?</td>
+                </tr>
+                <tr>
+                    <td><code>/agent restart</code></td>
+                    <td>Restart the bridge (not the screen session)</td>
+                </tr>
+                <tr>
+                    <td><code>/agent stop</code></td>
+                    <td>Send Ctrl+C to the agent if it is stuck</td>
+                </tr>
+                <tr>
+                    <td><code>/agent recent</code></td>
+                    <td>Show the PTY buffer captured by the bridge</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="info-box">
+            <h3>💡 Tips</h3>
+            <ul>
+                <li>The bridge now sends a true Enter keypress, so every prompt is actually submitted.</li>
+                <li>Wait at least the hint shown by the bot (default 1.5s) before running <code>pull</code>/<code>show</code>.</li>
+                <li>Need the log path? Run <code>logpath on</code> (and <code>logpath off</code> to hide it again).</li>
+                <li>Need to see the agent live? <code>screen -r slack-claude</code>, then Ctrl+A → D to detach.</li>
+                <li>Trim huge logs with <code>truncate -s 0 logs/claude_screen.log</code> when the agent is idle.</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <h3>⚠️ Only seeing UI text after <code>pull</code>?</h3>
+            <p>
+                That means the session is running but the agent hasn’t finished yet. Wait a little longer and run
+                <code>pull 200</code>. If nothing new appears, attach to the screen session and verify the CLI isn’t
+                waiting for extra input.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p><a href="index.html">← Back to Home</a> | <a href="commands.html">Full Command Reference →</a></p>
+        </div>
+    </div>
+</body>
+</html>

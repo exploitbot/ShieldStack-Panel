@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Details - Slack AI Agent Bot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Technical Details</h1>
+            <p>Architecture and implementation</p>
+        </header>
+
+        <nav class="breadcrumb">
+            <a href="index.html">← Back to Home</a>
+        </nav>
+
+        <div class="card">
+            <h2>🏗️ Architecture</h2>
+            <pre style="background: #f8f9fa; color: #333; font-size: 0.85em;">
+Slack Message
+    ↓
+slack_bot.py (Socket Mode connection)
+    ↓
+command_handler.py (parse shortcuts: "disk /var" → "Show disk usage for /var")
+    ↓
+agent_manager.py (manages Claude process via PTY)
+    ↓
+claude_persistent_wrapper.py (Python wrapper)
+    ↓
+Claude Code process (--dangerously-skip-permissions --session-id UUID)
+    ↓
+Response → wrapper → agent manager → slack_bot.py
+    ↓
+Live updates to Slack (every 2 seconds)
+    ↓
+Final response in Slack</pre>
+        </div>
+
+        <div class="card">
+            <h2>🔒 Session Isolation</h2>
+            <p>The bot uses a unique session ID to prevent context leakage:</p>
+            <ul>
+                <li><strong>Dedicated UUID:</strong> <code>1189d4f5-6375-4db7-b8e9-b902aba69ad2</code></li>
+                <li><strong>Stored in:</strong> <code>/home/appsforte/slackaiagent/.slack_bot_session_id</code></li>
+                <li><strong>Auto-generated:</strong> Created on first run, persists across restarts</li>
+                <li><strong>Conflict resolution:</strong> If "already in use", auto-generates new ID</li>
+            </ul>
+            
+            <h3>Why This Matters</h3>
+            <p>Without session isolation, the Slack bot would pull text from your terminal Claude sessions, causing confusion and security issues.</p>
+        </div>
+
+        <div class="card">
+            <h2>📁 File Locations</h2>
+            <table>
+                <tr>
+                    <th>File</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><code>/home/appsforte/slackaiagent/</code></td>
+                    <td>Main application directory</td>
+                </tr>
+                <tr>
+                    <td><code>.env</code></td>
+                    <td>Configuration (tokens, settings)</td>
+                </tr>
+                <tr>
+                    <td><code>slack_bot.py</code></td>
+                    <td>Slack integration (Socket Mode)</td>
+                </tr>
+                <tr>
+                    <td><code>claude_persistent_wrapper.py</code></td>
+                    <td>Claude Code wrapper with session ID</td>
+                </tr>
+                <tr>
+                    <td><code>command_handler.py</code></td>
+                    <td>40+ command shortcuts parser</td>
+                </tr>
+                <tr>
+                    <td><code>agent_manager.py</code></td>
+                    <td>Process manager (PTY communication)</td>
+                </tr>
+                <tr>
+                    <td><code>.slack_bot_session_id</code></td>
+                    <td>Session UUID storage</td>
+                </tr>
+                <tr>
+                    <td><code>/etc/systemd/system/slack-claude-bot.service</code></td>
+                    <td>SystemD service configuration</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>⚙️ Configuration</h2>
+            <p><strong>Environment Variables</strong> (<code>.env</code>):</p>
+            <table>
+                <tr>
+                    <th>Variable</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><code>SLACK_BOT_TOKEN</code></td>
+                    <td>Bot User OAuth Token (xoxb-...)</td>
+                </tr>
+                <tr>
+                    <td><code>SLACK_APP_TOKEN</code></td>
+                    <td>App-Level Token for Socket Mode (xapp-...)</td>
+                </tr>
+                <tr>
+                    <td><code>AGENT_COMMAND</code></td>
+                    <td>Command to start wrapper</td>
+                </tr>
+                <tr>
+                    <td><code>AGENT_RESPONSE_TIMEOUT</code></td>
+                    <td>Timeout in seconds (default: 120)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🔄 How Live Updates Work</h2>
+            <ol>
+                <li>User sends message in Slack</li>
+                <li>Bot creates initial "Processing..." message</li>
+                <li>Every 2 seconds, checks Claude's output buffer</li>
+                <li>Updates Slack message with current progress</li>
+                <li>Continues until ---RESPONSE-COMPLETE--- marker found</li>
+                <li>Final message shows complete response</li>
+            </ol>
+            
+            <h3>ANSI Filtering</h3>
+            <p>Claude Code outputs terminal control codes. The bot filters:</p>
+            <ul>
+                <li>ANSI escape sequences</li>
+                <li>Cursor movement codes</li>
+                <li>Color codes</li>
+                <li>UI prompts and boxes</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🛠️ Latest Fix (Nov 12, 2025)</h2>
+            <p><strong>Problem:</strong> Bot stuck at "Processing..." forever</p>
+            <p><strong>Root Cause:</strong> Wrapper sending double newline (<code>\n\n</code>) to Claude</p>
+            <p><strong>Solution:</strong> Changed to single newline (<code>\n</code>)</p>
+            
+            <h3>The Fix</h3>
+            <p>File: <code>claude_persistent_wrapper.py</code> line 127</p>
+            <pre><code># Before (broken):
+claude_process.stdin.write(user_input + "\n\n")
+
+# After (fixed):
+claude_process.stdin.write(user_input + "\n")</code></pre>
+            
+            <p><strong>Why:</strong> Claude in interactive mode expects single newline to submit commands.</p>
+        </div>
+
+        <div class="footer">
+            <p><a href="index.html">← Back to Home</a></p>
+            <p style="margin-top: 10px;">For complete technical documentation: <code>/home/appsforte/slackaiagent/AGENTS.md</code></p>
+        </div>
+    </div>
+</body>
+</html>

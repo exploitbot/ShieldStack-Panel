@@ -1,0 +1,158 @@
+Which Image Download Script Should I Use?
+==========================================
+
+You have 3 different scripts available in the grabimages/ folder.
+Here's which one to use based on your needs:
+
+
+OPTION 1: download_all_images.py ⭐ RECOMMENDED FOR YOU
+========================================================
+
+BEST FOR: Manual organization later
+
+What it does:
+  ✓ Downloads ALL 420+ images
+  ✓ Saves with descriptive filenames like:
+    - Sol660_How_to_Reset_Password_ID69773.png
+    - Sol123_Img2of3_Network_Configuration_ID45679.png
+  ✓ Creates detailed index file
+  ✗ Does NOT create Excel file
+
+Perfect if you want:
+  → All images downloaded with clear names
+  → To organize manually later
+  → Full control over how to use the images
+  → Simple, straightforward download
+
+Time: 5-10 minutes
+Complexity: Easy
+Output: Folder full of labeled images + index file
+
+README: grabimages/DOWNLOAD_ALL_IMAGES_README.txt
+
+
+OPTION 2: download_images_windows.py
+=====================================
+
+BEST FOR: Getting Excel with embedded images
+
+What it does:
+  ✓ Downloads all images
+  ✓ Creates Excel spreadsheet
+  ✓ Embeds first image of each solution
+  ✓ Windows-compatible (fixed CSV limit bug)
+
+Perfect if you want:
+  → Automated Excel creation
+  → Images embedded in cells
+  → One-stop solution
+  → Professional looking spreadsheet
+
+Time: 10-20 minutes
+Complexity: Medium
+Output: Excel file with embedded images + image folder
+
+README: grabimages/HOW_TO_DOWNLOAD_IMAGES.txt
+
+
+OPTION 3: download_images_auto.py
+==================================
+
+BEST FOR: Linux/automated environments
+
+What it does:
+  ✓ Same as Option 2
+  ✓ Hardcoded credentials (apps.forte/Help20!8)
+  ✓ No prompts
+  ✓ Linux version
+
+Perfect if you want:
+  → Run on Linux server
+  → Automated/scheduled downloads
+  → No manual input
+
+Time: 10-20 minutes
+Complexity: Medium
+Output: Excel file with embedded images + image folder
+
+
+QUICK DECISION GUIDE:
+=====================
+
+"I just want all the images with good filenames so I can
+ organize them myself later"
+   → Use: download_all_images.py ⭐
+
+"I want an Excel file with the images already embedded"
+   → Use: download_images_windows.py
+
+"I'm running this on a Linux server automatically"
+   → Use: download_images_auto.py
+
+
+HOW TO RUN (Windows):
+=====================
+
+1. Copy the entire 'grabimages' folder to your Windows PC
+
+2. Open Command Prompt
+
+3. Navigate to the folder:
+   cd C:\path\to\grabimages
+
+4. Run your chosen script:
+   python download_all_images.py
+   OR
+   python download_images_windows.py
+
+5. Enter credentials when prompted:
+   Username: apps.forte
+   Password: Help20!8
+
+6. Wait for download to complete!
+
+
+ALL SCRIPTS REQUIRE:
+====================
+✓ Python 3
+✓ pip install requests urllib3
+✓ Network access to https://helpdesk.appsforte.com
+✓ Valid ManageEngine credentials
+
+For Option 2 & 3, also need:
+✓ pip install openpyxl Pillow
+
+
+RECOMMENDATION:
+===============
+
+Based on your request to "grab all images and name them appropriately
+to organize manually later", I recommend:
+
+   👉 download_all_images.py 👈
+
+This gives you:
+  - All images with descriptive names
+  - Solution ID in filename
+  - Solution title in filename
+  - Image numbers (1 of 3, 2 of 3, etc.)
+  - Detailed index showing which images belong to which solutions
+  - Full control to organize however you want
+
+
+EXAMPLE OUTPUT (download_all_images.py):
+=========================================
+
+ManageEngine_Images/
+├── _IMAGE_INDEX.txt
+├── Sol12_Active_Directory_Setup_ID45001.png
+├── Sol25_Img1of2_Email_Configuration_ID45102.png
+├── Sol25_Img2of2_Email_Configuration_ID45103.png
+├── Sol660_How_to_Reset_Password_ID69773.png
+└── ... (420+ more images)
+
+
+QUESTIONS?
+==========
+See the README files in the grabimages/ folder for detailed
+instructions for each script.

@@ -1,0 +1,78 @@
+===============================================================================
+                 SLACK AI AGENT BOT – QUICK BOOTSTRAP (Nov 12, 2025)
+===============================================================================
+
+QUICK START: Just run ./init.sh start
+
+===============================================================================
+0. AUTOMATED SETUP (RECOMMENDED)
+===============================================================================
+
+The init.sh script handles everything automatically:
+
+    cd /home/appsforte/slackaiagent
+    ./init.sh start    # Full setup: screen + config + service
+
+Other commands:
+    ./init.sh          # Interactive menu
+    ./init.sh test     # Test if everything is working
+    ./init.sh logs     # View recent logs
+    ./init.sh attach   # Debug by attaching to the agent screen
+    ./init.sh stop     # Stop everything
+
+===============================================================================
+1. MANUAL SETUP (if needed)
+===============================================================================
+
+Step 1: Verify environment
+    cd /home/appsforte/slackaiagent
+    pip3 install -r requirements.txt
+    cat .env
+
+Step 2: Start the agent CLI in screen
+    mkdir -p /home/appsforte/slackaiagent/logs
+    screen -L -Logfile /home/appsforte/slackaiagent/logs/claude_screen.log \
+           -S slack-claude \
+           -dm bash -lc 'cd /home/appsforte/slackaiagent && /home/appsforte/.nvm/versions/node/v24.10.0/bin/claude --dangerously-skip-permissions'
+
+Step 3: Restart service
+    sudo systemctl restart slack-claude-bot
+    sudo systemctl status slack-claude-bot
+
+===============================================================================
+4. SLACK USAGE PATTERN
+===============================================================================
+
+Send any message → it is typed directly into the agent's screen session.
+Then run one of:
+  • `pull 80`     – tail the log (default from `CLAUDE_SCREEN_PULL_DEFAULT`)
+  • `show 50`     – alias of pull with a 50-line default
+  • `pull N` / `show N` – request a custom number of lines (max 400)
+  • `command help` – send `/help` inside the agent session
+  • `command connectvpn` – built-in VPN helpers (`autoconnectvpn`, `stopvpn`)
+  • `status`      – check screen/log availability
+  • `logpath on|off` – reveal or hide the log directory in Slack replies
+  • `help`        – show quick instructions
+
+Wait ~1–2 seconds between sending a command and running `pull`/`show` so the agent finishes responding.
+
+===============================================================================
+5. OPTIONAL SLASH COMMANDS (/agent …)
+===============================================================================
+
+  /agent status   – bridge running? (does NOT check screen)
+  /agent restart  – restarts bridge
+  /agent stop     – sends Ctrl+C to bridge
+  /agent recent   – dumps PTY buffer
+
+===============================================================================
+6. AFTER-ACTION TODO LIST
+===============================================================================
+
+  [ ] Create systemd unit to auto-launch screen session on boot
+  [ ] Sanitize ANSI codes in `pull` output for cleaner Slack messages
+  [ ] Add streaming tail command (auto-refresh during long runs)
+  [ ] Extend `/agent status` to verify both bridge and screen session
+
+Keep this file updated with any new operational steps.
+===============================================================================

@@ -1,0 +1,34 @@
+URL Correction Applied - October 29, 2025
+=========================================
+
+ISSUE:
+------
+Scripts were originally configured with incorrect domain:
+  ✗ https://helpdesk.appshosting.com (WRONG)
+
+FIXED TO:
+---------
+  ✓ https://helpdesk.appsforte.com (CORRECT)
+
+FILES UPDATED:
+--------------
+Python Scripts:
+  ✓ download_all_images.py
+  ✓ download_images_windows.py
+  ✓ download_images_auto.py
+  ✓ download_and_embed_images.py
+
+Documentation:
+  ✓ WHICH_SCRIPT_TO_USE.txt
+  ✓ DOWNLOAD_ALL_IMAGES_README.txt
+  ✓ HOW_TO_DOWNLOAD_IMAGES.txt
+  ✓ IMAGE_EXTRACTION_NOTES.txt
+
+VERIFIED:
+---------
+All references to the ManageEngine helpdesk now point to the correct domain:
+helpdesk.appsforte.com
+
+The scripts should now connect successfully to your ManageEngine instance.
+
+This note can be deleted - it's just for reference.

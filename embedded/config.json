@@ -1,0 +1,23 @@
+{
+  "_comment": "AppsForte AI Enhanced - Configuration File",
+  "_description": "Configure embedding model settings and behavior",
+
+  "lm_studio_url": "http://api.appsscale.com/v1",
+  "model": "local-model",
+  "embedding_model": "text-embedding-nomic-embed-text-v1.5",
+
+  "temperature": 0.7,
+  "max_tokens": 4096,
+
+  "enable_embeddings": true,
+  "similarity_threshold": 0.75,
+  "max_cache_entries": 100,
+  "relevant_history_count": 5,
+
+  "_notes": {
+    "enable_embeddings": "Set to false to disable all embedding features",
+    "similarity_threshold": "Cosine similarity threshold (0.0-1.0). Higher = stricter matching for cache hits",
+    "max_cache_entries": "Maximum number of tool results to cache",
+    "relevant_history_count": "Number of relevant past messages to include in context"
+  }
+}

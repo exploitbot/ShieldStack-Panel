@@ -1,0 +1,13 @@
+
+sudo pass is jinho2310
+ALWAYS make sure to test that both mobile and desktop versions function and look as good as possible with no visual errors by using a browser to check visuals.
+
+implement the following:
+
+ when logging in, i still keep getting a blank dark
+  blue screen even though i am using a new browser. make sure this doesnt happen
+  again. after finished with those changes, also make it so admins can create and
+  manage how tickets work, ticketing departments, and both client and admin have
+  seperate ticket indicators to show if ticket needs client response, if its open,
+  resolved, etc. also make it so admins can create hidden products that they can add
+  and manage to users. 

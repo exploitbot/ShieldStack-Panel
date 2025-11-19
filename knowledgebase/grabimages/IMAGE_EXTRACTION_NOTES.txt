@@ -1,0 +1,92 @@
+ManageEngine Embedded Images - Extraction Notes
+================================================
+
+SUMMARY:
+--------
+Found 420 embedded images across the solutions, but the actual image binary
+data could not be extracted from the database.
+
+IMAGE LOCATIONS IN DATABASE:
+----------------------------
+The images are referenced via API paths like:
+  /api/v3/solutions/660/images/69773
+
+Where:
+  - 660 = Solution ID
+  - 69773 = Image ID
+
+INVESTIGATION RESULTS:
+----------------------
+✗ Images NOT in: sdeskattachment table
+✗ Images NOT in: fileAttachments/Solutions directory (deleted/missing)
+✗ Images NOT in: contentstore table (doesn't exist)
+✗ Images NOT stored as BLOB/bytea in any obvious table
+
+POSSIBLE STORAGE LOCATIONS:
+----------------------------
+The images are likely stored in one of these ways:
+
+1. **Embedded in Description HTML** (Base64):
+   Some images might be embedded directly as base64 in the HTML.
+   Check the solution.description column for src="data:image..." patterns.
+
+2. **Separate Content Management System**:
+   ManageEngine may use a separate CMS or file store not in PostgreSQL.
+
+3. **File System** (Different Location):
+   Images might be in: C:\\Program Files\\ManageEngine\\ServiceDesk\\webapps\\
+   or another directory we haven't checked.
+
+4. **External Storage**:
+   Could be on S3, Azure Blob Storage, or similar.
+
+HOW TO ACCESS THE IMAGES:
+--------------------------
+The images ARE accessible through the ManageEngine web interface at:
+  https://helpdesk.appsforte.com/
+
+To view/extract images:
+1. Log into ManageEngine ServiceDesk
+2. Navigate to the specific solution (e.g., Solution #660)
+3. View the solution in the web interface
+4. Right-click on images and save them individually
+5. Or use browser developer tools to extract image URLs
+
+AUTOMATED EXTRACTION OPTIONS:
+------------------------------
+To extract all images programmatically:
+
+Option 1 - Web Scraping:
+  Use a tool like Selenium/Playwright to log into ManageEngine,
+  visit each solution page, and download images.
+
+Option 2 - API Authentication:
+  If you have API credentials, use the REST API with proper authentication:
+  GET https://helpdesk.appsforte.com/api/v3/solutions/{id}/images/{imageid}
+
+Option 3 - Database Deep Dive:
+  Have a DBA examine all tables with "oid" or "lo" (large object) types,
+  or check for tables we haven't explored yet.
+
+WHAT'S IN THE SPREADSHEET:
+---------------------------
+The Excel file includes:
+- All 647 solutions with descriptions
+- Markers showing where each image appears: [IMAGE #1 - ID: 69773]
+- Count of images per solution in "Embedded Images" column
+- All image IDs documented
+
+This allows you to:
+- See which solutions have images
+- Know exactly how many images each solution contains
+- Have the image IDs to look them up in ManageEngine
+
+RECOMMENDATION:
+---------------
+For a complete knowledge base with images, the best approach is:
+1. Use the Excel spreadsheet as the text reference
+2. Keep the ManageEngine system running for image access
+3. OR extract images manually/via web scraping for critical solutions
+
+Contact the ManageEngine vendor or check their documentation about
+where embedded solution images are stored in their architecture.

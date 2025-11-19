@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slack AI Agent Bot - Setup Complete</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6; color: #333; background: #f5f5f5;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 40px 20px; text-align: center;
+            border-radius: 10px; margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header p { font-size: 1.2em; opacity: 0.9; }
+        .card {
+            background: white; padding: 30px; margin-bottom: 20px;
+            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 { color: #667eea; margin-bottom: 15px; font-size: 1.8em; }
+        h3 { color: #764ba2; margin-top: 20px; margin-bottom: 10px; }
+        h4 { color: #555; margin-top: 15px; margin-bottom: 8px; }
+        code {
+            background: #f4f4f4; padding: 2px 6px; border-radius: 3px;
+            font-family: 'Courier New', monospace; color: #e83e8c; font-size: 0.9em;
+        }
+        pre {
+            background: #2d2d2d; color: #f8f8f2; padding: 15px;
+            border-radius: 5px; overflow-x: auto; margin: 15px 0;
+        }
+        pre code { background: none; color: inherit; padding: 0; }
+        .status {
+            display: inline-block; padding: 8px 16px;
+            border-radius: 20px; font-size: 1em; font-weight: 600;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.running { background: #cfe2ff; color: #084298; }
+        ul, ol { margin-left: 20px; margin-top: 10px; }
+        li { margin-bottom: 8px; }
+        .step {
+            background: #f8f9fa; border-left: 4px solid #667eea;
+            padding: 20px; margin: 15px 0;
+        }
+        .warning {
+            background: #fff3cd; border-left: 4px solid #ffc107;
+            padding: 15px; margin: 15px 0;
+        }
+        .error {
+            background: #f8d7da; border-left: 4px solid #dc3545;
+            padding: 15px; margin: 15px 0;
+        }
+        .success {
+            background: #d4edda; border-left: 4px solid #28a745;
+            padding: 15px; margin: 15px 0;
+        }
+        .info {
+            background: #d1ecf1; border-left: 4px solid #0c5460;
+            padding: 15px; margin: 15px 0;
+        }
+        a { color: #667eea; text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 0.9em; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #667eea; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .checklist { list-style-type: none; margin-left: 0; }
+        .checklist li:before {
+            content: "✓ "; color: #28a745; font-weight: bold; margin-right: 8px;
+        }
+        .nav-links {
+            background: white; padding: 15px; border-radius: 8px;
+            margin-bottom: 20px; text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-links a { margin: 0 15px; font-weight: 600; }
+        .highlight {
+            background: #fff3cd; padding: 3px 6px;
+            border-radius: 3px; font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Slack AI Agent Bot</h1>
+            <p>✅ Setup Complete & Running</p>
+            <p style="margin-top: 10px; font-size: 0.95em;">
+                <span class="status running">Active</span>
+                <span class="status success">Configured</span>
+            </p>
+        </header>
+
+        <div class="nav-links">
+            <a href="#status">Status</a> |
+            <a href="#test">Test Now</a> |
+            <a href="#finding-bot">Find Bot</a> |
+            <a href="#troubleshooting">Troubleshooting</a> |
+            <a href="#commands">Commands</a> |
+            <a href="#links">Quick Links</a>
+        </div>
+
+        <div class="card" id="status">
+            <h2>📊 System Status</h2>
+            
+            <div class="success">
+                <h3 style="margin-top: 0; color: #155724;">✅ All Systems Operational</h3>
+                <ul class="checklist">
+                    <li>Service is running and connected to Slack</li>
+                    <li>Bot User OAuth Token configured (<code>xoxb-</code>)</li>
+                    <li>App-Level Token configured (<code>xapp-</code>)</li>
+                    <li>Socket Mode connection active</li>
+                    <li>Agent process is running (example_agent.py)</li>
+                    <li>Messages Tab enabled in Slack app</li>
+                    <li>Auto-start on boot enabled</li>
+                </ul>
+            </div>
+
+            <h3>Current Configuration</h3>
+            <table>
+                <tr>
+                    <th>Component</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+                <tr>
+                    <td>Service</td>
+                    <td><span class="status running">Running</span></td>
+                    <td>slack-claude-bot.service</td>
+                </tr>
+                <tr>
+                    <td>Bot Token</td>
+                    <td><span class="status success">Valid</span></td>
+                    <td>xoxb-19404982852-9916...</td>
+                </tr>
+                <tr>
+                    <td>App Token</td>
+                    <td><span class="status success">Valid</span></td>
+                    <td>xapp-1-A09SW99R5MX-...</td>
+                </tr>
+                <tr>
+                    <td>Agent</td>
+                    <td><span class="status running">Active</span></td>
+                    <td>example_agent.py (test agent)</td>
+                </tr>
+                <tr>
+                    <td>Slack App ID</td>
+                    <td><span class="status success">Configured</span></td>
+                    <td>A09SW99R5MX</td>
+                </tr>
+            </table>
+
+            <h3>Check Live Status</h3>
+            <pre><code>sudo systemctl status slack-claude-bot
+sudo journalctl -u slack-claude-bot -f</code></pre>
+        </div>
+
+        <div class="card" id="test">
+            <h2>🎯 Test Your Bot NOW</h2>
+            
+            <div class="step">
+                <h3 style="margin-top: 0;">Quick Test (2 minutes)</h3>
+                <ol>
+                    <li><strong>Open Slack</strong></li>
+                    <li><strong>Press <code>Ctrl+K</code></strong> (or <code>Cmd+K</code> on Mac)</li>
+                    <li><strong>Search for your bot name</strong> (check App Home for exact name)</li>
+                    <li><strong>Send a test message:</strong> <code>Hello!</code></li>
+                    <li><strong>Expected response:</strong>
+                        <pre style="margin-top: 10px;"><code>Hello!
+You said: Hello!
+(This is a test agent - replace with your real AI!)</code></pre>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="info">
+                <strong>✅ If you get a response:</strong> Everything is working! You're ready to replace the example agent with Claude/Codex.
+                <br><br>
+                <strong>❌ If no response:</strong> Check the <a href="#troubleshooting">Troubleshooting</a> section below.
+            </div>
+        </div>
+
+        <div class="card" id="finding-bot">
+            <h2>🔍 How to Find Your Bot in Slack</h2>
+
+            <h3>Method 1: Quick Search (Recommended)</h3>
+            <ol>
+                <li>Get your bot's display name:
+                    <ul>
+                        <li>Go to <a href="https://api.slack.com/apps/A09SW99R5MX/general" target="_blank">App Basic Information</a></li>
+                        <li>Look for <strong>"Display Name (Bot Name)"</strong></li>
+                    </ul>
+                </li>
+                <li>In Slack, press <code>Ctrl+K</code> or <code>Cmd+K</code></li>
+                <li>Type your bot's name</li>
+                <li>Click to open direct message</li>
+            </ol>
+
+            <h3>Method 2: Apps Section</h3>
+            <ol>
+                <li>Open Slack</li>
+                <li>Look in left sidebar under <strong>"Apps"</strong></li>
+                <li>If not visible, click <strong>"Add apps"</strong></li>
+                <li>Search for your bot</li>
+                <li>Click to start messaging</li>
+            </ol>
+
+            <h3>Method 3: Browse All Apps</h3>
+            <ol>
+                <li>Click workspace name (top left)</li>
+                <li><strong>Settings & administration</strong> → <strong>Manage apps</strong></li>
+                <li>Find your bot in the list</li>
+                <li>Click <strong>"Open in Slack"</strong></li>
+            </ol>
+
+            <div class="warning">
+                <strong>Bot Status Indicator:</strong>
+                <ul style="margin-top: 10px;">
+                    <li><strong>Green dot</strong> = Bot is online and ready</li>
+                    <li><strong>Grey dot</strong> = Issue with tokens (check troubleshooting)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card" id="troubleshooting">
+            <h2>🔧 Troubleshooting</h2>
+
+            <div class="error">
+                <h3>Problem: Bot appears grey/offline or doesn't respond</h3>
+                <h4>Most Common Cause: Wrong Token Type</h4>
+                <p><strong>Check your tokens:</strong></p>
+                <pre><code>cat /home/appsforte/slackaiagent/.env | grep TOKEN | cut -c1-45</code></pre>
+                
+                <p><strong>Expected output:</strong></p>
+                <pre><code>SLACK_BOT_TOKEN=xoxb-19404982852-9916020...
+SLACK_APP_TOKEN=xapp-1-A09SW99R5MX-989503...</code></pre>
+
+                <div class="warning" style="margin-top: 15px;">
+                    <strong>⚠️ Critical:</strong> If SLACK_BOT_TOKEN starts with <code>xapp-</code> instead of <code>xoxb-</code>, that's your problem!
+                    <br><br>
+                    <strong>Fix:</strong>
+                    <ol>
+                        <li>Get Bot User OAuth Token: <a href="https://api.slack.com/apps/A09SW99R5MX/oauth" target="_blank">OAuth & Permissions</a></li>
+                        <li>Copy the token that starts with <code>xoxb-</code></li>
+                        <li>Update .env: <code>sudo nano /home/appsforte/slackaiagent/.env</code></li>
+                        <li>Restart: <code>sudo systemctl restart slack-claude-bot</code></li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="error">
+                <h3>Problem: "Sending messages to this app has been turned off"</h3>
+                <h4>Solution: Enable Messages Tab</h4>
+                <ol>
+                    <li>Go to <a href="https://api.slack.com/apps/A09SW99R5MX/app-home" target="_blank">App Home Settings</a></li>
+                    <li>Scroll to <strong>"Show Tabs"</strong> section</li>
+                    <li>Find <strong>"Messages Tab"</strong></li>
+                    <li>Toggle ON: <strong>"Allow users to send Slash commands and messages"</strong></li>
+                    <li>Save changes</li>
+                    <li>Reinstall app: <a href="https://api.slack.com/apps/A09SW99R5MX/install-on-team" target="_blank">Install App</a></li>
+                </ol>
+            </div>
+
+            <div class="error">
+                <h3>Problem: Can't find bot in Slack</h3>
+                <h4>Solution: Verify Installation</h4>
+                <ol>
+                    <li>Check installation status: <a href="https://api.slack.com/apps/A09SW99R5MX/install-on-team" target="_blank">Install App</a></li>
+                    <li>Look for <strong>"Installed"</strong> with green checkmark</li>
+                    <li>If not installed, click <strong>"Install to Workspace"</strong></li>
+                    <li>Authorize when prompted</li>
+                    <li>Wait 30 seconds, then search for bot in Slack</li>
+                </ol>
+            </div>
+
+            <h3>Check Service Logs</h3>
+            <pre><code># View last 50 log lines
+sudo journalctl -u slack-claude-bot -n 50
+
+# Watch logs in real-time
+sudo journalctl -u slack-claude-bot -f
+
+# Check service status
+sudo systemctl status slack-claude-bot</code></pre>
+
+            <h3>Common Error Messages</h3>
+            <table>
+                <tr>
+                    <th>Error</th>
+                    <th>Cause</th>
+                    <th>Fix</th>
+                </tr>
+                <tr>
+                    <td><code>not_allowed_token_type</code></td>
+                    <td>Using xapp- token for BOT_TOKEN</td>
+                    <td>Get xoxb- token from OAuth page</td>
+                </tr>
+                <tr>
+                    <td><code>invalid_auth</code></td>
+                    <td>Wrong or expired token</td>
+                    <td>Regenerate tokens in Slack app</td>
+                </tr>
+                <tr>
+                    <td><code>not_authed</code></td>
+                    <td>App not installed to workspace</td>
+                    <td>Reinstall app to workspace</td>
+                </tr>
+                <tr>
+                    <td><code>missing_scope</code></td>
+                    <td>Missing OAuth permissions</td>
+                    <td>Add required scopes, reinstall</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card" id="commands">
+            <h2>⚙️ Management Commands</h2>
+
+            <h3>Service Control</h3>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>sudo systemctl status slack-claude-bot</code></td>
+                    <td>Check if bot is running</td>
+                </tr>
+                <tr>
+                    <td><code>sudo systemctl restart slack-claude-bot</code></td>
+                    <td>Restart the bot (after config changes)</td>
+                </tr>
+                <tr>
+                    <td><code>sudo systemctl stop slack-claude-bot</code></td>
+                    <td>Stop the bot</td>
+                </tr>
+                <tr>
+                    <td><code>sudo systemctl start slack-claude-bot</code></td>
+                    <td>Start the bot</td>
+                </tr>
+                <tr>
+                    <td><code>sudo journalctl -u slack-claude-bot -f</code></td>
+                    <td>View live logs (Ctrl+C to exit)</td>
+                </tr>
+            </table>
+
+            <h3>Slack Commands (use in Slack)</h3>
+            <pre><code>/agent status    - Check agent status
+/agent restart   - Restart the agent process
+/agent clear     - Clear conversation context
+/agent recent    - Show recent agent output</code></pre>
+
+            <h3>Configuration</h3>
+            <pre><code># Edit configuration
+sudo nano /home/appsforte/slackaiagent/.env
+
+# After editing, restart service
+sudo systemctl restart slack-claude-bot
+
+# Verify changes took effect
+sudo journalctl -u slack-claude-bot -n 20</code></pre>
+
+            <h3>Health Check</h3>
+            <pre><code># Complete health check
+echo "=== Service Status ===" && \
+sudo systemctl status slack-claude-bot --no-pager | head -10 && \
+echo "" && echo "=== Recent Logs ===" && \
+sudo journalctl -u slack-claude-bot -n 5 --no-pager && \
+echo "" && echo "=== Token Types ===" && \
+cat /home/appsforte/slackaiagent/.env | grep TOKEN | cut -c1-45</code></pre>
+        </div>
+
+        <div class="card" id="links">
+            <h2>🔗 Important Links</h2>
+
+            <h3>Your Slack App</h3>
+            <ul>
+                <li><strong>App Management:</strong> <a href="https://api.slack.com/apps/A09SW99R5MX" target="_blank">https://api.slack.com/apps/A09SW99R5MX</a></li>
+                <li><strong>OAuth Tokens (get xoxb- token):</strong> <a href="https://api.slack.com/apps/A09SW99R5MX/oauth" target="_blank">OAuth & Permissions</a></li>
+                <li><strong>Socket Mode (get xapp- token):</strong> <a href="https://api.slack.com/apps/A09SW99R5MX/socket-mode" target="_blank">Socket Mode Settings</a></li>
+                <li><strong>Install/Reinstall App:</strong> <a href="https://api.slack.com/apps/A09SW99R5MX/install-on-team" target="_blank">Install to Workspace</a></li>
+                <li><strong>App Home (Messages Tab):</strong> <a href="https://api.slack.com/apps/A09SW99R5MX/app-home" target="_blank">App Home Settings</a></li>
+                <li><strong>Event Subscriptions:</strong> <a href="https://api.slack.com/apps/A09SW99R5MX/event-subscriptions" target="_blank">Event Settings</a></li>
+            </ul>
+
+            <h3>Server Documentation</h3>
+            <ul>
+                <li><strong>AGENTS.md:</strong> <code>/home/appsforte/slackaiagent/AGENTS.md</code></li>
+                <li><strong>README.md:</strong> <code>/home/appsforte/slackaiagent/README.md</code></li>
+                <li><strong>Configuration:</strong> <code>/home/appsforte/slackaiagent/.env</code></li>
+                <li><strong>Service File:</strong> <code>/etc/systemd/system/slack-claude-bot.service</code></li>
+            </ul>
+
+            <h3>Slack API Documentation</h3>
+            <ul>
+                <li><a href="https://api.slack.com/" target="_blank">Slack API Home</a></li>
+                <li><a href="https://api.slack.com/apis/connections/socket" target="_blank">Socket Mode Documentation</a></li>
+                <li><a href="https://api.slack.com/authentication/token-types" target="_blank">Token Types Explained</a></li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>📁 File Locations</h2>
+            <table>
+                <tr>
+                    <th>File/Directory</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><code>/home/appsforte/slackaiagent/</code></td>
+                    <td>Main application directory</td>
+                </tr>
+                <tr>
+                    <td><code>/home/appsforte/slackaiagent/.env</code></td>
+                    <td>Configuration file with tokens</td>
+                </tr>
+                <tr>
+                    <td><code>/home/appsforte/slackaiagent/AGENTS.md</code></td>
+                    <td>Complete technical documentation</td>
+                </tr>
+                <tr>
+                    <td><code>/home/appsforte/slackaiagent/main.py</code></td>
+                    <td>Application entry point</td>
+                </tr>
+                <tr>
+                    <td><code>/home/appsforte/slackaiagent/slack_bot.py</code></td>
+                    <td>Slack bot implementation</td>
+                </tr>
+                <tr>
+                    <td><code>/home/appsforte/slackaiagent/agent_manager.py</code></td>
+                    <td>Agent process manager</td>
+                </tr>
+                <tr>
+                    <td><code>/home/appsforte/slackaiagent/example_agent.py</code></td>
+                    <td>Test agent (currently active)</td>
+                </tr>
+                <tr>
+                    <td><code>/etc/systemd/system/slack-claude-bot.service</code></td>
+                    <td>Systemd service configuration</td>
+                </tr>
+                <tr>
+                    <td><code>/var/www/html/slackaiagent/</code></td>
+                    <td>Web documentation (this page)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🚀 Next Steps</h2>
+
+            <div class="step">
+                <h3>1. Test the Bot (Do This Now!)</h3>
+                <ul>
+                    <li>Open Slack and search for your bot</li>
+                    <li>Send a test message</li>
+                    <li>Verify you get a response</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <h3>2. Replace Example Agent (Optional)</h3>
+                <p>Once testing works, replace the example agent with your real AI:</p>
+                <pre><code>sudo nano /home/appsforte/slackaiagent/.env
+
+# Change this line:
+AGENT_COMMAND=claude --mode chat
+# Or:
+AGENT_COMMAND=codex --interactive
+# Or your custom agent:
+AGENT_COMMAND=python3 /path/to/your/agent.py
+
+# Then restart:
+sudo systemctl restart slack-claude-bot</code></pre>
+            </div>
+
+            <div class="step">
+                <h3>3. Use in Channels (Optional)</h3>
+                <ul>
+                    <li>Invite bot to any channel: <code>/invite @YourBotName</code></li>
+                    <li>Mention the bot: <code>@YourBotName help me with this</code></li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <h3>4. Monitor Logs</h3>
+                <pre><code>sudo journalctl -u slack-claude-bot -f</code></pre>
+                <p>Keep this running to see real-time activity</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Quick Reference</h2>
+            <table>
+                <tr>
+                    <th>Need to...</th>
+                    <th>Do this...</th>
+                </tr>
+                <tr>
+                    <td>Check if bot is running</td>
+                    <td><code>sudo systemctl status slack-claude-bot</code></td>
+                </tr>
+                <tr>
+                    <td>View logs</td>
+                    <td><code>sudo journalctl -u slack-claude-bot -f</code></td>
+                </tr>
+                <tr>
+                    <td>Restart bot</td>
+                    <td><code>sudo systemctl restart slack-claude-bot</code></td>
+                </tr>
+                <tr>
+                    <td>Change configuration</td>
+                    <td><code>sudo nano /home/appsforte/slackaiagent/.env</code></td>
+                </tr>
+                <tr>
+                    <td>Get Bot token</td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/oauth" target="_blank">OAuth & Permissions</a></td>
+                </tr>
+                <tr>
+                    <td>Enable messaging</td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/app-home" target="_blank">App Home → Messages Tab</a></td>
+                </tr>
+                <tr>
+                    <td>Reinstall app</td>
+                    <td><a href="https://api.slack.com/apps/A09SW99R5MX/install-on-team" target="_blank">Install to Workspace</a></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p><strong>Slack AI Agent Bot</strong> | Setup Complete ✅</p>
+            <p>Server: shieldstack.dev | Location: <code>/home/appsforte/slackaiagent/</code></p>
+            <p style="margin-top: 10px;">
+                App ID: <code>A09SW99R5MX</code> | 
+                <a href="https://api.slack.com/apps/A09SW99R5MX" target="_blank">Manage App</a> |
+                <a href="#status">Check Status</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85em;">
+                Last Updated: 2025-11-12 | Status: Active & Operational
+            </p>
+        </div>
+    </div>
+</body>
+</html>

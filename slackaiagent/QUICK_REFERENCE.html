@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Slack Agent Bot - Quick Reference</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 { color: #0ff; border-bottom: 2px solid #0ff; padding-bottom: 10px; }
+        h2 { color: #0f0; margin-top: 30px; }
+        .command {
+            background: #000;
+            border: 1px solid #0f0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #0f0;
+        }
+        a { color: #0ff; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #0f0;
+            text-align: left;
+        }
+        th { background: #0f0; color: #000; }
+        .critical { color: #f00; font-weight: bold; }
+        .success { color: #0f0; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>⚡ SLACK CLAUDE BOT - QUICK REFERENCE CARD ⚡</h1>
+
+    <div class="section">
+        <h2 class="critical">🚨 AFTER EVERY REBOOT - RUN THIS:</h2>
+        <div class="command">
+cd /home/appsforte/slackaiagent<br>
+./init.sh start
+        </div>
+        <p class="success">✅ This single command does everything!</p>
+    </div>
+
+    <div class="section">
+        <h2>📋 MANAGEMENT COMMANDS</h2>
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>What It Does</th>
+            </tr>
+            <tr>
+                <td><code>./init.sh</code></td>
+                <td>Interactive menu</td>
+            </tr>
+            <tr>
+                <td><code>./init.sh start</code></td>
+                <td>Full setup (use after reboot)</td>
+            </tr>
+            <tr>
+                <td><code>./init.sh test</code></td>
+                <td>Check if everything is working</td>
+            </tr>
+            <tr>
+                <td><code>./init.sh logs</code></td>
+                <td>View recent logs</td>
+            </tr>
+            <tr>
+                <td><code>./init.sh attach</code></td>
+                <td>Attach to the agent screen (debug mode)</td>
+            </tr>
+            <tr>
+                <td><code>./init.sh stop</code></td>
+                <td>Stop everything</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>💬 SLACK COMMANDS</h2>
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>What It Does</th>
+            </tr>
+            <tr>
+                <td><code>pull</code></td>
+                <td>Get last 80 lines from the agent log</td>
+            </tr>
+            <tr>
+                <td><code>pull 200</code></td>
+                <td>Get last 200 lines</td>
+            </tr>
+            <tr>
+                <td><code>show 50</code></td>
+                <td>Same as pull but defaults to 50 lines</td>
+            </tr>
+            <tr>
+                <td><code>status</code></td>
+                <td>Check system health</td>
+            </tr>
+            <tr>
+                <td><code>command help</code></td>
+                <td>Send `/help` inside the agent (any text works)</td>
+            </tr>
+            <tr>
+                <td><code>command connectvpn</code></td>
+                <td>Run VPN helper (also <code>autoconnectvpn</code>, <code>stopvpn</code>)</td>
+            </tr>
+            <tr>
+                <td><code>help</code></td>
+                <td>Show command list</td>
+            </tr>
+            <tr>
+                <td><code>/agent status</code></td>
+                <td>Service status</td>
+            </tr>
+            <tr>
+                <td><code>/agent restart</code></td>
+                <td>Restart bridge</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>🔧 TROUBLESHOOTING</h2>
+        <table>
+            <tr>
+                <th>Problem</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td>Empty pull results</td>
+                <td>Wait longer, agent still processing</td>
+            </tr>
+            <tr>
+                <td>Old/stale output</td>
+                <td><code>./init.sh start</code></td>
+            </tr>
+            <tr>
+                <td>Bot not responding</td>
+                <td><code>./init.sh test</code></td>
+            </tr>
+            <tr>
+                <td>Service crashed</td>
+                <td><code>./init.sh start</code></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📍 KEY LOCATIONS</h2>
+        <div class="command">
+Project: /home/appsforte/slackaiagent<br>
+Log: /home/appsforte/slackaiagent/logs/claude_screen.log<br>
+Service: /etc/systemd/system/slack-claude-bot.service<br>
+Screen Session: slack-claude<br>
+Web Docs: http://shieldstack.dev:9090/slackaiagent/
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🎯 QUICK TEST</h2>
+        <ol>
+            <li>In Slack, send to bot: <strong>"What is 2+2?"</strong></li>
+            <li>Wait 2-3 seconds</li>
+            <li>Send: <strong>"pull"</strong></li>
+            <li>You should see the agent's response!</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>⚙️ SERVICE COMMANDS</h2>
+        <div class="command">
+sudo systemctl status slack-claude-bot<br>
+sudo systemctl restart slack-claude-bot<br>
+sudo journalctl -u slack-claude-bot -f
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🖥️ SCREEN COMMANDS</h2>
+        <div class="command">
+screen -ls                    # List sessions<br>
+screen -r slack-claude        # Attach to the agent<br>
+Ctrl+A then D                 # Detach from session<br>
+screen -S slack-claude -X quit  # Kill session
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📚 DOCUMENTATION</h2>
+        <ul>
+            <li><a href="index.html">Main Documentation Hub</a></li>
+            <li><a href="commands.html">Complete Command Reference</a></li>
+            <li><a href="troubleshooting.html">Troubleshooting Guide</a></li>
+            <li><a href="technical.html">Technical Architecture</a></li>
+            <li><a href="AGENTS.md">AGENTS.md - Operator Guide</a></li>
+        </ul>
+    </div>
+
+    <hr style="border-color: #0f0; margin: 40px 0;">
+    <p style="text-align: center;">
+        <strong>💡 Remember: ./init.sh start fixes most problems!</strong><br>
+        Last Updated: November 12, 2025
+    </p>
+</body>
+</html>
