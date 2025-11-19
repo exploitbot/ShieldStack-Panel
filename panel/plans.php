@@ -7,7 +7,6 @@ $auth->requireLogin();
 
 $db = Database::getInstance()->getConnection();
 
-?>
 // Get all active plans grouped by category
 $plansStmt = $db->prepare("SELECT * FROM plans WHERE status = 'active' AND (hidden IS NULL OR hidden = 0) ORDER BY display_order, category, price ASC");
 $plansStmt->execute();
@@ -57,6 +56,7 @@ foreach ($allPlans as $plan) {
 }
 
 // Handle order submission
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -159,14 +159,18 @@ foreach ($allPlans as $plan) {
                         <div class="plans-grid">
                             <?php foreach ($plans as $plan): ?>
                                 <?php $features = json_decode($plan['features'], true); ?>
-                                <div class="plan-card">
-                                    <div class="plan-header">
-                                        <h3 class="plan-name"><?php echo htmlspecialchars($plan['name']); ?></h3>
-                                        <div class="plan-price">
-                                            $<?php echo number_format($plan['price'], 2); ?>
-                                            <span>/<?php echo htmlspecialchars($plan['billing_cycle']); ?></span>
-                                        </div>
-                                    </div>
+                        <div class="plan-card">
+                            <div class="plan-header">
+                                <h3 class="plan-name"><?php echo htmlspecialchars($plan['name']); ?></h3>
+                                <div class="plan-price">
+                                    <?php if ($plan['price'] > 0): ?>
+                                        $<?php echo number_format($plan['price'], 2); ?>
+                                        <span>/<?php echo htmlspecialchars($plan['billing_cycle']); ?></span>
+                                    <?php else: ?>
+                                        <span>Contact us for pricing</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
 
                                     <p class="plan-description"><?php echo htmlspecialchars($plan['description']); ?></p>
 

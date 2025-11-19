@@ -23,6 +23,7 @@ $customerId = $auth->getCurrentCustomerId();
 
 try {
     $sessionId = $_GET['session_id'] ?? '';
+    $websiteId = isset($_GET['website_id']) ? (int)$_GET['website_id'] : null;
 
     if (empty($sessionId)) {
         throw new Exception('Session ID required');
@@ -32,7 +33,7 @@ try {
     $stmt = $db->prepare("
         SELECT *
         FROM ai_chat_sessions
-        WHERE session_id = ? AND customer_id = ?
+        WHERE session_id = ? AND customer_id = ? AND is_active = 1
     ");
     $stmt->execute([$sessionId, $customerId]);
     $session = $stmt->fetch();
@@ -41,11 +42,17 @@ try {
         throw new Exception('Session not found');
     }
 
+    if ($websiteId && (int)$session['ssh_credential_id'] !== $websiteId) {
+        throw new Exception('Session is not linked to the selected website');
+    }
+
     $messages = json_decode($session['messages'], true) ?: [];
 
     echo json_encode([
         'success' => true,
         'session_id' => $sessionId,
+        'session_name' => $session['session_name'] ?? 'Untitled Chat',
+        'website_id' => (int)$session['ssh_credential_id'],
         'messages' => $messages,
         'total_tokens' => $session['total_tokens_used']
     ]);

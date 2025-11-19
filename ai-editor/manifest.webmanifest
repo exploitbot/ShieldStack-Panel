@@ -1,0 +1,23 @@
+{
+  "name": "ShieldStack AI Editor",
+  "short_name": "AI Editor",
+  "start_url": "/ai-editor/",
+  "scope": "/ai-editor/",
+  "display": "standalone",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "icons": [
+    {
+      "src": "/upload/uploads/temp/B2-QCJKt.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/upload/uploads/temp/B2-QCJKt.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -8,6 +8,9 @@
 - Database config: `/var/www/html/panel/includes/config.php` and `/var/www/html/includes/config.php` (point to `shieldstack_panel` DB)  
 - Logs: PHP-FPM (`/var/log/php-fpm/www-error.log`), Nginx (`/var/log/nginx/ai.shieldstack.dev-error.log`, `ai_error.log` if present)
 
+> Update (Nov 2025): AI Editor now supports multi-website selection and multi-session chat management (see `ai-editor/api/sessions.php`, updated `chat.php/get-session.php`, and UI JS/CSS). Choose a website before opening chat sessions; sessions can be cleared/reset per site.
+> Update (Nov 2025): Admin dashboard now includes “Browser Cache Control” to bump a global cache-buster (`system_settings.cache_buster_version`) and force clients to reload CSS/JS; topbar appends the version to asset URLs and reloads once when it changes.
+
 # ShieldStack Panel - Setup & Usage Guide
 
 ## 🚀 Quick Start

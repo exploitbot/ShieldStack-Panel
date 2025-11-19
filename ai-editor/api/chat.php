@@ -31,8 +31,10 @@ try {
         throw new Exception('Invalid request method');
     }
 
-    $message = $_POST['message'] ?? '';
+    $message = trim($_POST['message'] ?? '');
     $sessionId = $_POST['session_id'] ?? null;
+    $sessionName = trim($_POST['session_name'] ?? '');
+    $websiteId = isset($_POST['website_id']) ? (int)$_POST['website_id'] : null;
 
     if (empty($message)) {
         throw new Exception('Message is required');
@@ -52,35 +54,89 @@ try {
         throw new Exception('Token limit exceeded. Please contact support to upgrade your plan.');
     }
 
-    // Get SSH credentials
-    $stmt = $db->prepare("SELECT * FROM customer_ssh_credentials WHERE customer_id = ? AND is_active = 1 LIMIT 1");
-    $stmt->execute([$customerId]);
+    // Load existing session when provided
+    $existingSession = null;
+    if ($sessionId) {
+        $sessionStmt = $db->prepare("
+            SELECT *
+            FROM ai_chat_sessions
+            WHERE session_id = ? AND customer_id = ?
+            LIMIT 1
+        ");
+        $sessionStmt->execute([$sessionId, $customerId]);
+        $existingSession = $sessionStmt->fetch();
+
+        if (!$existingSession) {
+            throw new Exception('Invalid session');
+        }
+
+        if ((int)$existingSession['is_active'] !== 1) {
+            throw new Exception('This chat session has been archived. Create a new session to continue.');
+        }
+
+        if (!$websiteId && !empty($existingSession['ssh_credential_id'])) {
+            $websiteId = (int)$existingSession['ssh_credential_id'];
+        } elseif (!empty($existingSession['ssh_credential_id']) && $websiteId && (int)$existingSession['ssh_credential_id'] !== $websiteId) {
+            throw new Exception('Session does not belong to the selected website.');
+        }
+
+        if (empty($sessionName)) {
+            $sessionName = $existingSession['session_name'] ?? '';
+        }
+    }
+
+    if (!$websiteId) {
+        throw new Exception('Please choose a website to edit before chatting.');
+    }
+
+    // Get SSH credentials for selected website
+    $stmt = $db->prepare("
+        SELECT * FROM customer_ssh_credentials
+        WHERE id = ? AND customer_id = ? AND is_active = 1
+        LIMIT 1
+    ");
+    $stmt->execute([$websiteId, $customerId]);
     $sshCreds = $stmt->fetch();
 
     if (!$sshCreds) {
-        throw new Exception('SSH credentials not configured');
+        throw new Exception('Invalid or inactive website selection');
     }
 
     // Create or load session
     if (!$sessionId) {
         $sessionId = uniqid('session_', true);
+        $sessionName = $sessionName ?: generateSessionName($message, $sshCreds);
+
         $stmt = $db->prepare("
-            INSERT INTO ai_chat_sessions (customer_id, session_id, ssh_credential_id, messages)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO ai_chat_sessions (customer_id, session_id, ssh_credential_id, session_name, messages)
+            VALUES (?, ?, ?, ?, ?)
         ");
-        $stmt->execute([$customerId, $sessionId, $sshCreds['id'], json_encode([])]);
+        $stmt->execute([$customerId, $sessionId, $sshCreds['id'], $sessionName, json_encode([])]);
+
+        $messages = [];
+    } else {
+        $messages = json_decode($existingSession['messages'], true) ?: [];
+
+        // Backfill missing website linkage on legacy sessions
+        if (empty($existingSession['ssh_credential_id'])) {
+            $attachStmt = $db->prepare("
+                UPDATE ai_chat_sessions
+                SET ssh_credential_id = ?
+                WHERE session_id = ? AND customer_id = ?
+            ");
+            $attachStmt->execute([$sshCreds['id'], $sessionId, $customerId]);
+        }
     }
 
-    // Load session messages
-    $stmt = $db->prepare("SELECT messages FROM ai_chat_sessions WHERE session_id = ? AND customer_id = ?");
-    $stmt->execute([$sessionId, $customerId]);
-    $session = $stmt->fetch();
-
-    if (!$session) {
-        throw new Exception('Invalid session');
+    if (!is_string($sessionName)) {
+        $sessionName = '';
     }
 
-    $messages = json_decode($session['messages'], true) ?: [];
+    // Ensure the session has a friendly name
+    if (empty($sessionName) || $sessionName === 'Untitled Chat' || stripos($sessionName, 'New Chat') === 0) {
+        $sessionName = generateSessionName($message, $sshCreds);
+    }
+    $sessionName = mb_substr($sessionName, 0, 255);
 
     // Add user message to history
     $messages[] = [
@@ -98,7 +154,8 @@ try {
         'customer_name' => $customerName,
         'web_root_path' => $sshCreds['web_root_path'],
         'website_url' => $sshCreds['website_url'],
-        'website_type' => $sshCreds['website_type']
+        'website_type' => $sshCreds['website_type'],
+        'website_name' => $sshCreds['website_name'] ?? null
     ];
     $systemPrompt = $aiClient->buildSystemPrompt($context);
 
@@ -151,10 +208,10 @@ try {
     // Update session
     $stmt = $db->prepare("
         UPDATE ai_chat_sessions
-        SET messages = ?, total_tokens_used = total_tokens_used + ?, last_message_at = NOW()
+        SET messages = ?, total_tokens_used = total_tokens_used + ?, last_message_at = NOW(), session_name = ?, ssh_credential_id = ?
         WHERE session_id = ?
     ");
-    $stmt->execute([json_encode($messages), $tokensUsed, $sessionId]);
+    $stmt->execute([json_encode($messages), $tokensUsed, $sessionName, $sshCreds['id'], $sessionId]);
 
     // Update plan token usage
     $stmt = $db->prepare("UPDATE ai_service_plans SET tokens_used = tokens_used + ? WHERE id = ?");
@@ -183,6 +240,8 @@ try {
         'success' => true,
         'response' => $aiContent,
         'session_id' => $sessionId,
+        'session_name' => $sessionName,
+        'website_id' => (int)$sshCreds['id'],
         'tokens_used' => $tokensUsed,
         'tokens_remaining' => $tokensRemaining,
         'warnings' => $warnings
@@ -194,6 +253,29 @@ try {
         'success' => false,
         'error' => $e->getMessage()
     ]);
+}
+
+/**
+ * Build a short, user-friendly session name
+ */
+function generateSessionName($message, $sshCreds = null) {
+    $prefix = '';
+
+    if (is_array($sshCreds)) {
+        $prefix = $sshCreds['website_name'] ?? ($sshCreds['website_url'] ?? '');
+        if (!empty($prefix)) {
+            $prefix = trim($prefix) . ' - ';
+        }
+    }
+
+    $snippet = preg_replace('/\s+/', ' ', trim($message));
+    $snippet = mb_substr($snippet, 0, 60);
+
+    if (mb_strlen($snippet) === 0) {
+        $snippet = 'Chat Session';
+    }
+
+    return $prefix . $snippet;
 }
 
 /**

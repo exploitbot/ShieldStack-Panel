@@ -9,6 +9,13 @@
 - Logs: PHP-FPM (`/var/log/php-fpm/www-error.log`), Nginx (`/var/log/nginx/ai.shieldstack.dev-error.log`, `ai_error.log` if present)
 - Entry points: `/var/www/html/index.html` (landing), `/var/www/html/login.php` (login), `/var/www/html/panel/` (portal shell)
 
+## Latest Updates (multi-site & multi-session)
+- Customers can now have multiple active websites; selection is required before loading chat sessions (persisted in session).
+- Chat sessions are website-scoped with a new session drawer + open tab bar; multiple sessions can be open at once.
+- Sessions can be cleared (messages + token counters reset) via UI or `POST ai-editor/api/sessions.php` (`action=clear`).
+- New API: `ai-editor/api/sessions.php` (list/create/clear); existing `chat.php`/`get-session.php` now enforce `website_id` and `is_active`.
+- UI JS overhauled (`assets/js/chat-interface.js`) to manage session tabs, welcome state per website, and localStorage keys per site.
+
 # AI Editor — Agent Guide
 
 ## Overview
@@ -36,6 +43,7 @@ AI-powered website editor (customer UI + admin UI). Relies on Claude via Clove p
 - API client: `ai-editor/includes/ai-client.php` (loads config from DB; now guards against duplicate `Database` class loads)
 - Anthropic adapter: `ai-editor/includes/ai-anthropic-adapter.php`
 - Chat endpoint: `ai-editor/api/chat.php`
+- Session management: `ai-editor/api/sessions.php` (list/create/clear, website-scoped)
 - SSH manager: `ai-editor/includes/ssh-manager.php`
 - Safety validator: `ai-editor/includes/safety-validator.php`
 - Backup manager: `ai-editor/includes/backup-manager.php`
@@ -65,6 +73,11 @@ AI-powered website editor (customer UI + admin UI). Relies on Claude via Clove p
 - DB config check:
   ```sql
   SELECT `key`, value FROM system_settings WHERE `key` LIKE 'ai_%';
+  ```
+- List sessions for a site:
+  ```bash
+  curl -s "https://shieldstack.dev/ai-editor/api/sessions.php?website_id=<ssh_credential_id>" \
+    -b "PHPSESSID=<session_cookie>"
   ```
 - PHP CLI AI ping:
   ```bash

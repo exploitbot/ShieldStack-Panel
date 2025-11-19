@@ -1,11 +1,13 @@
 <?php
 require_once '../includes/auth.php';
 require_once '../includes/database.php';
+require_once '../includes/cache-buster.php';
 
 $auth = new Auth();
 $auth->requireAdmin();
 
 $db = Database::getInstance()->getConnection();
+$cacheBusterVersion = getCacheBusterVersion();
 
 // Get admin stats
 $customersStmt = $db->query("SELECT COUNT(*) as count FROM customers WHERE is_admin = 0");
@@ -112,6 +114,24 @@ $recentTickets = $recentTicketsStmt->fetchAll();
                 </div>
 
                 <div class="card">
+                    <div class="card-header" style="align-items: center; gap: 1rem;">
+                        <div>
+                            <h2 class="card-title" style="margin: 0;">Browser Cache Control</h2>
+                            <p class="text-muted" style="margin: 0;">Force all users to fetch fresh CSS/JS on their next visit.</p>
+                        </div>
+                        <button class="btn btn-danger" id="clearCacheBtn">Clear Browser Cache</button>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted" id="cacheStatus">
+                            Current cache version: <strong><?php echo htmlspecialchars($cacheBusterVersion); ?></strong>
+                        </p>
+                        <p style="margin-bottom: 0;">
+                            Clearing cache bumps the global asset version. Browsers will auto-reload with new assets even if they previously cached old files.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Recent Customers</h2>
                         <a href="customers.php" class="btn btn-secondary">View All</a>
@@ -213,5 +233,33 @@ $recentTickets = $recentTicketsStmt->fetchAll();
         </div>
     </div>
     <script src="../assets/js/mobile-menu.js"></script>
+    <script>
+        (function() {
+            const btn = document.getElementById('clearCacheBtn');
+            const statusEl = document.getElementById('cacheStatus');
+            if (!btn || !statusEl) return;
+
+            btn.addEventListener('click', async () => {
+                btn.disabled = true;
+                const original = btn.textContent;
+                btn.textContent = 'Clearing...';
+
+                try {
+                    const res = await fetch('cache-bust.php', { method: 'POST' });
+                    const data = await res.json();
+                    if (!data.success) {
+                        throw new Error(data.error || 'Request failed');
+                    }
+                    statusEl.innerHTML = 'Current cache version: <strong>' + data.version + '</strong>';
+                    alert('Browser caches cleared. Users will fetch fresh assets on their next visit.');
+                } catch (err) {
+                    alert('Failed to clear cache: ' + err.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = original;
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
